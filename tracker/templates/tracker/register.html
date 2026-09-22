@@ -1,0 +1,627 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Create Account - Expense Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            min-height: 100vh;
+
+            background: linear-gradient(
+                135deg,
+                #eef2ff 0%,
+                #f5f7fb 50%,
+                #ede9fe 100%
+            );
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+        }
+
+
+        .register-wrapper {
+            width: 100%;
+
+            max-width: 1050px;
+
+            display: grid;
+
+            grid-template-columns:
+                0.9fr 1.1fr;
+
+            background: white;
+
+            border-radius: 24px;
+
+            overflow: hidden;
+
+            box-shadow:
+                var(--shadow-lg);
+        }
+
+
+        .register-brand {
+            padding: 55px;
+
+            background: linear-gradient(
+                145deg,
+                #4f46e5,
+                #7c3aed
+            );
+
+            color: white;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+        }
+
+
+        .logo {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            font-size: 27px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .register-brand h1 {
+            font-size: 35px;
+
+            line-height: 1.2;
+
+            margin-bottom: 15px;
+        }
+
+
+        .register-brand p {
+            max-width: 380px;
+
+            color:
+                rgba(255, 255, 255, 0.82);
+
+            font-size: 14px;
+
+            line-height: 1.7;
+        }
+
+
+        .feature-list {
+            margin-top: 30px;
+        }
+
+
+        .feature {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 14px;
+
+            color:
+                rgba(255, 255, 255, 0.92);
+
+            font-size: 14px;
+        }
+
+
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 8px;
+
+            background:
+                rgba(255, 255, 255, 0.12);
+        }
+
+
+        .register-form {
+            padding: 45px 50px;
+        }
+
+
+        .register-form h2 {
+            font-size: 28px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .subtitle {
+            color: var(--text-light);
+
+            font-size: 14px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .message {
+            padding: 12px 14px;
+
+            margin-bottom: 18px;
+
+            background: #fef2f2;
+
+            border: 1px solid #fecaca;
+
+            border-radius: 9px;
+
+            color: #b91c1c;
+
+            font-size: 13px;
+        }
+
+
+        .field-errors {
+            margin-top: 6px;
+
+            color: #dc2626;
+
+            font-size: 12px;
+        }
+
+
+        .field-errors ul {
+            margin-left: 17px;
+        }
+
+
+        .help-text {
+            margin-top: 5px;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        .register-form p {
+            margin-bottom: 16px;
+        }
+
+
+        .register-form label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .register-form input {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition: var(--transition);
+        }
+
+
+        .register-form input:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(99, 102, 241, 0.12);
+        }
+
+
+        .register-btn {
+            width: 100%;
+
+            margin-top: 7px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: var(--primary);
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+        }
+
+
+        .register-btn:hover {
+            background: var(--primary-dark);
+
+            transform: translateY(-1px);
+        }
+
+
+        .login-text {
+            margin-top: 22px;
+
+            text-align: center;
+
+            color: var(--text-light);
+
+            font-size: 13px;
+        }
+
+
+        .login-text a {
+            color: var(--primary);
+
+            font-weight: 600;
+        }
+
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+
+        @media (max-width: 800px) {
+
+            .register-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+
+            .register-brand {
+                display: none;
+            }
+
+
+            .register-form {
+                padding: 35px 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="register-wrapper">
+
+
+    <!-- BRAND PANEL -->
+
+    <div class="register-brand">
+
+
+        <div class="logo">
+            ₹
+        </div>
+
+
+        <h1>
+            Start managing your money smarter.
+        </h1>
+
+
+        <p>
+            Create your account and get a clear view of
+            your income, expenses, budgets and financial reports.
+        </p>
+
+
+        <div class="feature-list">
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Organize your transactions
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Set monthly and yearly budgets
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Analyze your spending patterns
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Export detailed financial reports
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- REGISTRATION FORM -->
+
+    <div class="register-form">
+
+
+        <h2>
+            Create your account
+        </h2>
+
+
+        <p class="subtitle">
+            Fill in your details to get started.
+        </p>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- NAME -->
+
+            <p>
+
+                <label for="{{ form.first_name.id_for_label }}">
+                    Name
+                </label>
+
+                {{ form.first_name }}
+
+
+                {% if form.first_name.errors %}
+
+                    <div class="field-errors">
+                        {{ form.first_name.errors }}
+                    </div>
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- EMAIL -->
+
+            <p>
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email Address
+                </label>
+
+                {{ form.email }}
+
+
+                {% if form.email.errors %}
+
+                    <div class="field-errors">
+                        {{ form.email.errors }}
+                    </div>
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- PHONE -->
+
+            <p>
+
+                <label for="{{ form.phone.id_for_label }}">
+                    Phone Number
+                </label>
+
+                {{ form.phone }}
+
+
+                {% if form.phone.errors %}
+
+                    <div class="field-errors">
+                        {{ form.phone.errors }}
+                    </div>
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- PASSWORD -->
+
+            <p>
+
+                <label for="{{ form.password1.id_for_label }}">
+                    Password
+                </label>
+
+                {{ form.password1 }}
+
+
+                {% if form.password1.help_text %}
+
+                    <div class="help-text">
+                        {{ form.password1.help_text|safe }}
+                    </div>
+
+                {% endif %}
+
+
+                {% if form.password1.errors %}
+
+                    <div class="field-errors">
+                        {{ form.password1.errors }}
+                    </div>
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <p>
+
+                <label for="{{ form.password2.id_for_label }}">
+                    Confirm Password
+                </label>
+
+                {{ form.password2 }}
+
+
+                {% if form.password2.errors %}
+
+                    <div class="field-errors">
+                        {{ form.password2.errors }}
+                    </div>
+
+                {% endif %}
+
+            </p>
+
+
+            <button
+                type="submit"
+                class="register-btn"
+            >
+                Create Account
+            </button>
+
+
+        </form>
+
+
+        <div class="login-text">
+
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Sign in
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

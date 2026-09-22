@@ -1,0 +1,434 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Transaction - Expense Tracker</title>
+
+    <!-- Global Styles -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .page-container {
+            width: min(900px, 94%);
+            margin: auto;
+        }
+
+        /* ================= HEADER ================= */
+
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .page-header h1 {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+
+            padding: 10px 15px;
+
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+
+            color: #374151;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            box-shadow: var(--shadow-sm);
+
+            transition: 0.2s ease;
+        }
+
+        .back-btn:hover {
+            color: #4f46e5;
+            border-color: #6366f1;
+            transform: translateY(-1px);
+        }
+
+        /* ================= FORM CARD ================= */
+
+        .form-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+
+            padding: 32px;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-intro {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+
+            margin-bottom: 30px;
+            padding-bottom: 22px;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .intro-icon {
+            width: 48px;
+            height: 48px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 12px;
+
+            background: #eef2ff;
+            color: #4f46e5;
+
+            font-size: 21px;
+        }
+
+        .form-intro h2 {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .form-intro p {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        /* ================= FORM ================= */
+
+        .transaction-form p {
+            margin-bottom: 20px;
+        }
+
+        .transaction-form label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #374151;
+
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .transaction-form input,
+        .transaction-form select,
+        .transaction-form textarea {
+            width: 100%;
+
+            padding: 12px 14px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+
+            background: white;
+            color: #374151;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition: 0.2s ease;
+        }
+
+        .transaction-form input:focus,
+        .transaction-form select:focus,
+        .transaction-form textarea:focus {
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .transaction-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .transaction-form .helptext {
+            display: block;
+
+            margin-top: 5px;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+        }
+
+        .errorlist {
+            list-style: none;
+
+            margin: 6px 0 0;
+            padding: 0;
+
+            color: #dc2626;
+
+            font-size: 12px;
+        }
+
+        /* ================= ACTIONS ================= */
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+
+            gap: 10px;
+
+            margin-top: 28px;
+            padding-top: 22px;
+
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .cancel-btn,
+        .update-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 140px;
+
+            padding: 12px 18px;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .cancel-btn {
+            background: #f8fafc;
+
+            border: 1px solid #e5e7eb;
+
+            color: #4b5563;
+        }
+
+        .cancel-btn:hover {
+            background: #f1f5f9;
+        }
+
+        .update-btn {
+            border: none;
+
+            background: #6366f1;
+
+            color: white;
+        }
+
+        .update-btn:hover {
+            background: #4f46e5;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 6px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 650px) {
+
+            .page {
+                padding: 20px 12px;
+            }
+
+            .page-container {
+                width: 100%;
+            }
+
+            .page-header {
+                flex-direction: column;
+            }
+
+            .back-btn {
+                width: 100%;
+            }
+
+            .form-card {
+                padding: 22px 18px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .cancel-btn,
+            .update-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+    <div class="page-container">
+
+
+        <!-- ================= HEADER ================= -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1>
+                    Edit Transaction
+                </h1>
+
+                <p>
+                    Update the details of your transaction.
+                </p>
+
+            </div>
+
+
+            <a
+                href="{% url 'transaction_list' %}"
+                class="back-btn"
+            >
+                ← Transactions
+            </a>
+
+        </div>
+
+
+
+        <!-- ================= FORM ================= -->
+
+        <div class="form-card">
+
+
+            <div class="form-intro">
+
+                <div class="intro-icon">
+                    ✎
+                </div>
+
+
+                <div>
+
+                    <h2>
+                        Update Transaction Details
+                    </h2>
+
+                    <p>
+                        Make the necessary changes and save them.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <form
+                method="POST"
+                class="transaction-form"
+            >
+
+                {% csrf_token %}
+
+                {{ form.as_p }}
+
+
+                <div class="form-actions">
+
+
+                    <a
+                        href="{% url 'transaction_list' %}"
+                        class="cancel-btn"
+                    >
+                        Cancel
+                    </a>
+
+
+                    <button
+                        type="submit"
+                        class="update-btn"
+                    >
+                        Update Transaction
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

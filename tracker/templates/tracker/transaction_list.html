@@ -1,0 +1,1098 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Transactions - Expense Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            background: #f5f7fb;
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .page-container {
+            width: min(1250px, 94%);
+            margin: auto;
+        }
+
+
+        /* ================= HEADER ================= */
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .page-title h1 {
+            font-size: 30px;
+            margin-bottom: 5px;
+        }
+
+        .page-title p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 11px 16px;
+
+            border-radius: 9px;
+
+            background: white;
+            border: 1px solid #e5e7eb;
+
+            color: #374151;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            box-shadow: var(--shadow-sm);
+
+            transition: 0.2s ease;
+        }
+
+        .top-btn:hover {
+            transform: translateY(-1px);
+            border-color: #6366f1;
+            color: #4f46e5;
+        }
+
+        .top-btn.primary {
+            background: #6366f1;
+            border-color: #6366f1;
+            color: white;
+        }
+
+        .top-btn.primary:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+
+        /* ================= FILTER CARD ================= */
+
+        .filter-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+
+            padding: 22px;
+
+            margin-bottom: 25px;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+        }
+
+        .filter-header h2 {
+            font-size: 17px;
+        }
+
+        .filter-header span {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .filter-grid {
+            display: grid;
+
+            grid-template-columns:
+                1.6fr
+                1fr
+                1fr
+                1fr
+                1fr
+                auto;
+
+            gap: 12px;
+
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #4b5563;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+
+            padding: 11px 12px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+
+            background: #fff;
+
+            color: #374151;
+
+            font-size: 13px;
+
+            outline: none;
+
+            transition: 0.2s ease;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            border-color: #6366f1;
+
+            box-shadow:
+                0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .filter-btn {
+            height: 40px;
+
+            padding: 0 18px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #6366f1;
+            color: white;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+
+        /* ================= TABLE CARD ================= */
+
+        .table-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-header {
+            padding: 20px 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table-header h2 {
+            font-size: 17px;
+        }
+
+        .transaction-count {
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            background: #eef2ff;
+            color: #4f46e5;
+
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 950px;
+        }
+
+        th {
+            padding: 14px 18px;
+
+            background: #f8fafc;
+
+            color: #64748b;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 18px;
+
+            font-size: 13px;
+
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #fafbff;
+        }
+
+
+        /* ================= TYPE ================= */
+
+        .type-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+        .income-badge {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .expense-badge {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+
+        /* ================= CATEGORY ================= */
+
+        .category-name {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 7px;
+
+            background: #f3f4f6;
+
+            color: #4b5563;
+
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+
+        /* ================= AMOUNT ================= */
+
+        .amount {
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+        .income-amount {
+            color: #059669;
+        }
+
+        .expense-amount {
+            color: #dc2626;
+        }
+
+
+        /* ================= DESCRIPTION ================= */
+
+        .description {
+            max-width: 220px;
+
+            color: #6b7280;
+
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+        /* ================= ACTIONS ================= */
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .action-btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 7px 10px;
+
+            border-radius: 7px;
+
+            font-size: 11px;
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+        .edit-btn {
+            background: #eef2ff;
+            color: #4f46e5;
+        }
+
+        .edit-btn:hover {
+            background: #e0e7ff;
+        }
+
+        .delete-btn {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #fee2e2;
+        }
+
+
+        /* ================= EMPTY STATE ================= */
+
+        .empty-state {
+            padding: 70px 25px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 65px;
+            height: 65px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 auto 18px;
+
+            border-radius: 18px;
+
+            background: #eef2ff;
+
+            font-size: 28px;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+
+            margin-bottom: 7px;
+        }
+
+        .empty-state p {
+            color: #9ca3af;
+
+            font-size: 13px;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* ================= FOOTER ================= */
+
+        .bottom-actions {
+            display: flex;
+
+            justify-content: space-between;
+            align-items: center;
+
+            margin-top: 20px;
+        }
+
+        .back-link {
+            color: #6b7280;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: #4f46e5;
+        }
+
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 1100px) {
+
+            .filter-grid {
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .page {
+                padding: 20px 12px;
+            }
+
+            .page-container {
+                width: 100%;
+            }
+
+            .topbar {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .top-actions {
+                width: 100%;
+            }
+
+            .top-btn {
+                flex: 1;
+
+                justify-content: center;
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-btn {
+                width: 100%;
+            }
+
+            .bottom-actions {
+                flex-direction: column;
+
+                align-items: stretch;
+
+                gap: 15px;
+            }
+
+            .back-link {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+    <div class="page-container">
+
+
+        <!-- ================= HEADER ================= -->
+
+        <div class="topbar">
+
+
+            <div class="page-title">
+
+                <h1>
+                    Transaction History
+                </h1>
+
+                <p>
+                    Search, filter and manage all your transactions.
+                </p>
+
+            </div>
+
+
+            <div class="top-actions">
+
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="top-btn"
+                >
+                    ← Dashboard
+                </a>
+
+
+                <a
+                    href="{% url 'add_transaction' %}"
+                    class="top-btn primary"
+                >
+                    + Add Transaction
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================= FILTERS ================= -->
+
+        <div class="filter-card">
+
+
+            <div class="filter-header">
+
+                <h2>
+                    Search & Filter
+                </h2>
+
+                <span>
+                    Refine your transaction history
+                </span>
+
+            </div>
+
+
+            <form method="GET">
+
+
+                <div class="filter-grid">
+
+
+                    <!-- SEARCH -->
+
+                    <div class="filter-group">
+
+                        <label for="search">
+                            Search
+                        </label>
+
+                        <input
+                            type="text"
+                            id="search"
+                            name="search"
+                            placeholder="Search transactions..."
+                            value="{{ search_query }}"
+                        >
+
+                    </div>
+
+
+                    <!-- CATEGORY -->
+
+                    <div class="filter-group">
+
+                        <label for="category">
+                            Category
+                        </label>
+
+                        <select
+                            name="category"
+                            id="category"
+                        >
+
+                            <option value="">
+                                All Categories
+                            </option>
+
+
+                            {% for category in categories %}
+
+                                <option
+                                    value="{{ category.id }}"
+
+                                    {% if category.id|stringformat:"s" == category_filter %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ category.name }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- TYPE -->
+
+                    <div class="filter-group">
+
+                        <label for="type">
+                            Type
+                        </label>
+
+                        <select
+                            name="type"
+                            id="type"
+                        >
+
+                            <option value="">
+                                All Types
+                            </option>
+
+
+                            <option
+                                value="income"
+
+                                {% if type_filter == "income" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Income
+                            </option>
+
+
+                            <option
+                                value="expense"
+
+                                {% if type_filter == "expense" %}
+                                    selected
+                                {% endif %}
+                            >
+                                Expense
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- FROM DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="date_from">
+                            From
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date_from"
+                            name="date_from"
+                            value="{{ date_from }}"
+                        >
+
+                    </div>
+
+
+                    <!-- TO DATE -->
+
+                    <div class="filter-group">
+
+                        <label for="date_to">
+                            To
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date_to"
+                            name="date_to"
+                            value="{{ date_to }}"
+                        >
+
+                    </div>
+
+
+                    <!-- SEARCH BUTTON -->
+
+                    <div class="filter-group">
+
+                        <button
+                            type="submit"
+                            class="filter-btn"
+                        >
+                            Search
+                        </button>
+
+                    </div>
+
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+
+        <!-- ================= TRANSACTIONS ================= -->
+
+        <div class="table-card">
+
+
+            <div class="table-header">
+
+                <h2>
+                    Transactions
+                </h2>
+
+
+                {% if transactions %}
+
+                    <span class="transaction-count">
+                        {{ transactions|length }} found
+                    </span>
+
+                {% endif %}
+
+
+            </div>
+
+
+
+            {% if transactions %}
+
+
+                <div class="table-wrapper">
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Date
+                                </th>
+
+                                <th>
+                                    Type
+                                </th>
+
+                                <th>
+                                    Category
+                                </th>
+
+                                <th>
+                                    Amount
+                                </th>
+
+                                <th>
+                                    Payment Method
+                                </th>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    Actions
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for transaction in transactions %}
+
+
+                                <tr>
+
+
+                                    <!-- DATE -->
+
+                                    <td>
+                                        {{ transaction.date|date:"d M Y" }}
+                                    </td>
+
+
+                                    <!-- TYPE -->
+
+                                    <td>
+
+
+                                        {% if transaction.type == 'income' %}
+
+                                            <span
+                                                class="type-badge income-badge"
+                                            >
+                                                ↗ Income
+                                            </span>
+
+                                        {% else %}
+
+                                            <span
+                                                class="type-badge expense-badge"
+                                            >
+                                                ↘ Expense
+                                            </span>
+
+                                        {% endif %}
+
+
+                                    </td>
+
+
+                                    <!-- CATEGORY -->
+
+                                    <td>
+
+                                        <span class="category-name">
+                                            {{ transaction.category.name }}
+                                        </span>
+
+                                    </td>
+
+
+                                    <!-- AMOUNT -->
+
+                                    <td>
+
+
+                                        <span
+                                            class="
+                                                amount
+
+                                                {% if transaction.type == 'income' %}
+                                                    income-amount
+                                                {% else %}
+                                                    expense-amount
+                                                {% endif %}
+                                            "
+                                        >
+
+
+                                            {% if transaction.type == 'income' %}
+
+                                                + ₹{{ transaction.amount|floatformat:2 }}
+
+                                            {% else %}
+
+                                                - ₹{{ transaction.amount|floatformat:2 }}
+
+                                            {% endif %}
+
+
+                                        </span>
+
+
+                                    </td>
+
+
+                                    <!-- PAYMENT METHOD -->
+
+                                    <td>
+                                        {{ transaction.get_payment_method_display }}
+                                    </td>
+
+
+                                    <!-- DESCRIPTION -->
+
+                                    <td>
+
+
+                                        <div class="description">
+
+
+                                            {% if transaction.description %}
+
+                                                {{ transaction.description }}
+
+                                            {% else %}
+
+                                                -
+
+                                            {% endif %}
+
+
+                                        </div>
+
+
+                                    </td>
+
+
+                                    <!-- ACTIONS -->
+
+                                    <td>
+
+
+                                        <div class="actions">
+
+
+                                            <a
+                                                href="{% url 'edit_transaction' transaction.id %}"
+                                                class="action-btn edit-btn"
+                                            >
+                                                Edit
+                                            </a>
+
+
+                                            <a
+                                                href="{% url 'delete_transaction' transaction.id %}"
+                                                class="action-btn delete-btn"
+                                            >
+                                                Delete
+                                            </a>
+
+
+                                        </div>
+
+
+                                    </td>
+
+
+                                </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <!-- EMPTY STATE -->
+
+                <div class="empty-state">
+
+
+                    <div class="empty-icon">
+                        💳
+                    </div>
+
+
+                    <h3>
+                        No transactions found
+                    </h3>
+
+
+                    <p>
+                        Try changing your search or filters,
+                        or add your first transaction.
+                    </p>
+
+
+                    <a
+                        href="{% url 'add_transaction' %}"
+                        class="top-btn primary"
+                    >
+                        + Add Transaction
+                    </a>
+
+
+                </div>
+
+
+            {% endif %}
+
+
+        </div>
+
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <div class="bottom-actions">
+
+
+            <a
+                href="{% url 'dashboard' %}"
+                class="back-link"
+            >
+                ← Back to Dashboard
+            </a>
+
+
+            <a
+                href="{% url 'add_transaction' %}"
+                class="back-link"
+            >
+                + Add another transaction
+            </a>
+
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,508 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login - Expense Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            min-height: 100vh;
+
+            background: linear-gradient(
+                135deg,
+                #eef2ff 0%,
+                #f5f7fb 50%,
+                #ede9fe 100%
+            );
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+        }
+
+
+        .auth-wrapper {
+            width: 100%;
+
+            max-width: 1000px;
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            background: white;
+
+            border-radius: 24px;
+
+            overflow: hidden;
+
+            box-shadow:
+                var(--shadow-lg);
+        }
+
+
+        .auth-brand {
+            padding: 55px;
+
+            background: linear-gradient(
+                145deg,
+                #4f46e5,
+                #7c3aed
+            );
+
+            color: white;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+        }
+
+
+        .auth-brand .logo {
+            width: 58px;
+            height: 58px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 16px;
+
+            background:
+                rgba(255, 255, 255, 0.15);
+
+            font-size: 27px;
+
+            margin-bottom: 25px;
+        }
+
+
+        .auth-brand h1 {
+            font-size: 36px;
+
+            line-height: 1.2;
+
+            margin-bottom: 15px;
+        }
+
+
+        .auth-brand p {
+            color:
+                rgba(255, 255, 255, 0.8);
+
+            font-size: 15px;
+
+            line-height: 1.7;
+
+            max-width: 380px;
+        }
+
+
+        .feature-list {
+            margin-top: 30px;
+        }
+
+
+        .feature {
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin-bottom: 14px;
+
+            color:
+                rgba(255, 255, 255, 0.9);
+
+            font-size: 14px;
+        }
+
+
+        .feature-icon {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            background:
+                rgba(255, 255, 255, 0.12);
+
+            border-radius: 8px;
+        }
+
+
+        .auth-form {
+            padding: 55px 50px;
+        }
+
+
+        .auth-form h2 {
+            font-size: 28px;
+
+            margin-bottom: 7px;
+        }
+
+
+        .auth-subtitle {
+            color: var(--text-light);
+
+            font-size: 14px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .message {
+            padding: 12px 14px;
+
+            margin-bottom: 20px;
+
+            background: #fef2f2;
+
+            border: 1px solid #fecaca;
+
+            border-radius: 9px;
+
+            color: #b91c1c;
+
+            font-size: 13px;
+        }
+
+
+        .auth-form .form-group {
+            margin-bottom: 20px;
+        }
+
+
+        .auth-form label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .auth-form input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+            font-size: 14px;
+
+            outline: none;
+
+            transition: var(--transition);
+        }
+
+
+        .auth-form input:focus {
+            border-color: var(--primary);
+
+            box-shadow:
+                0 0 0 3px
+                rgba(99, 102, 241, 0.12);
+        }
+
+
+        .login-btn {
+            width: 100%;
+
+            margin-top: 5px;
+
+            padding: 13px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: var(--primary);
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: var(--transition);
+        }
+
+
+        .login-btn:hover {
+            background: var(--primary-dark);
+
+            transform: translateY(-1px);
+        }
+
+
+        .register-text {
+            margin-top: 25px;
+
+            text-align: center;
+
+            color: var(--text-light);
+
+            font-size: 13px;
+        }
+
+
+        .register-text a {
+            color: var(--primary);
+
+            font-weight: 600;
+        }
+
+
+        .register-text a:hover {
+            text-decoration: underline;
+        }
+
+
+        @media (max-width: 750px) {
+
+            .auth-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+
+            .auth-brand {
+                display: none;
+            }
+
+
+            .auth-form {
+                padding: 40px 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="auth-wrapper">
+
+
+    <!-- BRAND -->
+
+    <div class="auth-brand">
+
+
+        <div class="logo">
+            ₹
+        </div>
+
+
+        <h1>
+            Take control of your money.
+        </h1>
+
+
+        <p>
+            Track expenses, manage budgets and understand
+            where your money goes — all from one simple dashboard.
+        </p>
+
+
+        <div class="feature-list">
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Track income and expenses
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Set and monitor budgets
+                </span>
+
+            </div>
+
+
+            <div class="feature">
+
+                <span class="feature-icon">
+                    ✓
+                </span>
+
+                <span>
+                    Generate financial reports
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- LOGIN FORM -->
+
+    <div class="auth-form">
+
+
+        <h2>
+            Welcome back
+        </h2>
+
+
+        <p class="auth-subtitle">
+            Sign in to continue to your Expense Tracker.
+        </p>
+
+
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label for="email">
+                    Username or Email
+                </label>
+
+
+                <input
+                    type="text"
+                    id="email"
+                    name="email"
+                    placeholder="Enter username or email"
+                    autocomplete="username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="login-btn"
+            >
+                Sign In
+            </button>
+
+
+        </form>
+
+
+        <div class="register-text">
+
+            Don't have an account?
+
+            <a href="{% url 'register' %}">
+                Create one
+            </a>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

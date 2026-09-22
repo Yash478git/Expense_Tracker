@@ -1,0 +1,204 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Page Not Found - Expense Tracker</title>
+
+    <!-- Global Styles -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+
+            background: #f5f7fb;
+        }
+
+
+        .error-card {
+            width: min(520px, 100%);
+
+            padding: 45px 35px;
+
+            text-align: center;
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 20px;
+
+            box-shadow: var(--shadow-lg);
+        }
+
+
+        .error-icon {
+            width: 80px;
+            height: 80px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            margin: 0 auto 22px;
+
+            border-radius: 22px;
+
+            background: #eef2ff;
+
+            color: #6366f1;
+
+            font-size: 32px;
+        }
+
+
+        .error-code {
+            font-size: 58px;
+
+            line-height: 1;
+
+            font-weight: 800;
+
+            color: #4f46e5;
+
+            margin-bottom: 10px;
+        }
+
+
+        .error-card h1 {
+            font-size: 24px;
+
+            color: #1f2937;
+
+            margin-bottom: 8px;
+        }
+
+
+        .error-card p {
+            color: #6b7280;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        .home-btn {
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 12px 20px;
+
+            border-radius: 9px;
+
+            background: #6366f1;
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+
+        .home-btn:hover {
+            background: #4f46e5;
+
+            transform: translateY(-1px);
+
+            color: white;
+        }
+
+
+        @media (max-width: 500px) {
+
+            .error-card {
+                padding: 35px 22px;
+            }
+
+            .error-code {
+                font-size: 48px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="error-card">
+
+    <div class="error-icon">
+        🔍
+    </div>
+
+
+    <div class="error-code">
+        404
+    </div>
+
+
+    <h1>
+        Page Not Found
+    </h1>
+
+
+    <p>
+        The page you're looking for doesn't exist,
+        may have been moved, or is no longer available.
+    </p>
+
+
+    <a
+        href="{% url 'dashboard' %}"
+        class="home-btn"
+    >
+        ← Back to Dashboard
+    </a>
+
+</div>
+
+</body>
+
+</html>

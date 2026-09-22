@@ -1,0 +1,433 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Delete Transaction - Expense Tracker</title>
+
+    <!-- Global Styles -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Expense Tracker Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+
+        body {
+            min-height: 100vh;
+
+            background: #f5f7fb;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 25px;
+        }
+
+
+        .delete-card {
+            width: min(520px, 100%);
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 20px;
+
+            padding: 35px;
+
+            box-shadow: var(--shadow-lg);
+
+            text-align: center;
+        }
+
+
+        /* ================= WARNING ICON ================= */
+
+        .warning-icon {
+            width: 64px;
+            height: 64px;
+
+            margin: 0 auto 20px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 18px;
+
+            background: #fef2f2;
+
+            color: #dc2626;
+
+            font-size: 28px;
+        }
+
+
+        /* ================= HEADING ================= */
+
+        .delete-card h1 {
+            font-size: 26px;
+
+            margin-bottom: 8px;
+
+            color: #1f2937;
+        }
+
+
+        .subtitle {
+            color: #6b7280;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* ================= TRANSACTION DETAILS ================= */
+
+        .transaction-details {
+            background: #f8fafc;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 12px;
+
+            padding: 20px;
+
+            margin-bottom: 25px;
+
+            text-align: left;
+        }
+
+
+        .detail-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            padding: 11px 0;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            font-size: 13px;
+        }
+
+
+        .detail-row:last-child {
+            border-bottom: none;
+
+            padding-bottom: 0;
+        }
+
+
+        .detail-row:first-child {
+            padding-top: 0;
+        }
+
+
+        .detail-label {
+            color: #6b7280;
+
+            font-weight: 500;
+        }
+
+
+        .detail-value {
+            color: #374151;
+
+            font-weight: 600;
+
+            text-align: right;
+        }
+
+
+        .amount-value {
+            color: #dc2626;
+
+            font-size: 16px;
+        }
+
+
+        /* ================= WARNING MESSAGE ================= */
+
+        .warning-message {
+            padding: 13px 15px;
+
+            margin-bottom: 25px;
+
+            border-radius: 9px;
+
+            background: #fff7ed;
+
+            border: 1px solid #fed7aa;
+
+            color: #c2410c;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        /* ================= ACTIONS ================= */
+
+        .actions {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 10px;
+        }
+
+
+        .cancel-btn,
+        .delete-btn {
+            min-width: 145px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 12px 18px;
+
+            border-radius: 9px;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition: 0.2s ease;
+        }
+
+
+        .cancel-btn {
+            background: #f8fafc;
+
+            border: 1px solid #e5e7eb;
+
+            color: #4b5563;
+        }
+
+
+        .cancel-btn:hover {
+            background: #f1f5f9;
+        }
+
+
+        .delete-btn {
+            border: none;
+
+            background: #dc2626;
+
+            color: white;
+
+            cursor: pointer;
+        }
+
+
+        .delete-btn:hover {
+            background: #b91c1c;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 6px 15px
+                rgba(220, 38, 38, 0.2);
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 550px) {
+
+            .delete-card {
+                padding: 25px 20px;
+            }
+
+
+            .actions {
+                flex-direction: column-reverse;
+            }
+
+
+            .cancel-btn,
+            .delete-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="delete-card">
+
+
+    <!-- ================= WARNING ================= -->
+
+    <div class="warning-icon">
+        ⚠
+    </div>
+
+
+    <h1>
+        Delete Transaction?
+    </h1>
+
+
+    <p class="subtitle">
+
+        Are you sure you want to permanently delete
+        this transaction?
+
+        This action cannot be undone.
+
+    </p>
+
+
+
+    <!-- ================= DETAILS ================= -->
+
+    <div class="transaction-details">
+
+
+        <div class="detail-row">
+
+            <span class="detail-label">
+                Category
+            </span>
+
+            <span class="detail-value">
+                {{ transaction.category.name }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span class="detail-label">
+                Amount
+            </span>
+
+            <span class="detail-value amount-value">
+                ₹{{ transaction.amount|floatformat:2 }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span class="detail-label">
+                Type
+            </span>
+
+            <span class="detail-value">
+                {{ transaction.type|title }}
+            </span>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span class="detail-label">
+                Date
+            </span>
+
+            <span class="detail-value">
+                {{ transaction.date|date:"d M Y" }}
+            </span>
+
+        </div>
+
+
+    </div>
+
+
+
+    <!-- ================= WARNING ================= -->
+
+    <div class="warning-message">
+
+        ⚠ This transaction will be permanently removed
+        from your transaction history.
+
+    </div>
+
+
+
+    <!-- ================= ACTIONS ================= -->
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+
+        <div class="actions">
+
+
+            <a
+                href="{% url 'transaction_list' %}"
+                class="cancel-btn"
+            >
+                Cancel
+            </a>
+
+
+            <button
+                type="submit"
+                class="delete-btn"
+            >
+                Yes, Delete Transaction
+            </button>
+
+
+        </div>
+
+
+    </form>
+
+
+</div>
+
+
+</body>
+
+</html>
