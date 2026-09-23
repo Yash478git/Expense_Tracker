@@ -1,375 +1,1136 @@
 {% extends "admin/base.html" %}
-
 {% load static %}
 
 {% block title %}
-    Expense Tracker Administration
-{% endblock %}
-
-
-{% block extrahead %}
-    {{ block.super }}
-    <link
-        rel="icon"
-        type="image/png"
-        href="{% static 'tracker/favicon.png' %}?v=3"
-    >
-    <link
-        rel="shortcut icon"
-        href="{% static 'tracker/favicon.png' %}?v=3"
-    >
-{% endblock %}
-
-
-{% block branding %}
-
-    <div id="site-name">
-
-        <a href="{% url 'admin:index' %}">
-            Expense Tracker
-        </a>
-
-    </div>
-
-{% endblock %}
-
-
-{% block nav-global %}
+    {{ title }} | Expense Tracker
 {% endblock %}
 
 
 {% block extrastyle %}
 
-    {{ block.super }}
+{{ block.super }}
 
-    <style>
+<style>
 
-        /* =====================================================
-           ADMIN GLOBAL
-           ===================================================== */
+/* =========================================================
+   EXPENSE TRACKER ADMIN
+   Dashboard-style visual system
+   ========================================================= */
 
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --admin-bg: #f5f7fb;
-            --admin-card: #ffffff;
-            --admin-text: #1f2937;
-            --admin-muted: #6b7280;
-            --admin-border: #e5e7eb;
-        }
+:root {
 
+    --et-primary: #6366f1;
+    --et-primary-dark: #4f46e5;
+    --et-primary-light: #eef2ff;
 
-        body {
-            background: var(--admin-bg);
-            color: var(--admin-text);
-        }
+    --et-background: #f5f7fb;
+    --et-card: #ffffff;
 
+    --et-border: #e5e7eb;
 
-        /* =====================================================
-           HEADER
-           ===================================================== */
+    --et-text: #1f2937;
+    --et-text-secondary: #6b7280;
+    --et-text-muted: #9ca3af;
 
-        #header {
-            background: #111827;
-            color: white;
+    --et-success: #059669;
+    --et-danger: #dc2626;
 
-            padding: 14px 24px;
-        }
+    --et-shadow-sm:
+        0 3px 12px rgba(15, 23, 42, 0.05);
 
+    --et-shadow-md:
+        0 8px 22px rgba(15, 23, 42, 0.07);
 
-        #branding h1,
-        #branding h1 a {
-            color: white !important;
-        }
+}
 
 
-        #site-name a {
-            color: white !important;
+/* =========================================================
+   GLOBAL
+   ========================================================= */
 
-            font-size: 21px;
-            font-weight: 700;
+html,
+body {
 
-            text-decoration: none;
-        }
+    background: var(--et-background) !important;
 
+    color: var(--et-text) !important;
 
-        #user-tools {
-            color: #d1d5db;
-        }
+}
 
 
-        #user-tools a {
-            color: #c7d2fe;
-        }
+body {
 
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 
-        #user-tools a:hover {
-            color: white;
-        }
+}
 
 
-        /* =====================================================
-           MAIN CONTENT
-           ===================================================== */
+/* =========================================================
+   CONTAINER
+   ========================================================= */
 
-        #content {
-            padding: 30px;
-        }
+#container {
 
+    background: transparent !important;
 
-        #content-main {
-            width: 100%;
-        }
+    min-width: 0;
 
+}
 
-        /* =====================================================
-           MODULES / CARDS
-           ===================================================== */
 
-        .module {
-            background: var(--admin-card);
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-            border: 1px solid var(--admin-border);
+#header {
 
-            border-radius: 14px;
+    min-height: 68px;
 
-            overflow: hidden;
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #6366f1
+        ) !important;
 
-            box-shadow:
-                0 3px 12px rgba(15, 23, 42, 0.05);
-        }
+    padding: 0 28px;
 
+    display: flex;
 
-        .module h2,
-        .module caption {
-            background: #f8fafc;
+    align-items: center;
 
-            color: #374151;
+    box-shadow:
+        0 4px 18px rgba(79, 70, 229, 0.16);
 
-            border-bottom:
-                1px solid var(--admin-border);
+}
 
-            font-size: 14px;
-            font-weight: 700;
-        }
 
+#branding {
 
-        .module caption {
-            padding: 13px 16px;
-        }
+    display: flex;
 
+    align-items: center;
 
-        /* =====================================================
-           LINKS
-           ===================================================== */
+}
 
-        a {
-            color: var(--primary);
-        }
 
+#branding h1 {
 
-        a:hover {
-            color: var(--primary-dark);
-        }
+    margin: 0;
 
+    padding: 0;
 
-        /* =====================================================
-           BUTTONS
-           ===================================================== */
+    font-size: 21px;
 
-        input[type="submit"],
-        button,
-        .button,
-        a.button {
-            border-radius: 8px !important;
+    font-weight: 750;
 
-            transition:
-                0.2s ease !important;
-        }
+    letter-spacing: 0.1px;
 
+}
 
-        input[type="submit"],
-        .button {
-            background: var(--primary) !important;
-        }
 
+#branding h1 a {
 
-        input[type="submit"]:hover,
-        .button:hover {
-            background: var(--primary-dark) !important;
-        }
+    color: #ffffff !important;
 
+    text-decoration: none;
 
-        /* =====================================================
-           TABLES
-           ===================================================== */
+}
 
-        #result_list {
-            border-radius: 10px;
 
-            overflow: hidden;
-        }
+#branding h1 a:hover {
 
+    color: #ffffff !important;
 
-        #result_list thead th {
-            background: #f8fafc;
+}
 
-            color: #64748b;
 
-            font-size: 11px;
+/* =========================================================
+   USER TOOLS
+   ========================================================= */
 
-            text-transform: uppercase;
+#user-tools {
 
-            letter-spacing: 0.3px;
-        }
+    margin-left: auto;
 
+    color: rgba(255, 255, 255, 0.92) !important;
 
-        #result_list tbody tr:hover {
-            background: #fafbff;
-        }
+    font-size: 12px;
 
+}
 
-        #result_list td,
-        #result_list th {
-            border-bottom:
-                1px solid #eef0f3;
-        }
 
+#user-tools a {
 
-        /* =====================================================
-           FORM FIELDS
-           ===================================================== */
+    color: #ffffff !important;
 
-        input[type="text"],
-        input[type="password"],
-        input[type="email"],
-        input[type="number"],
-        input[type="url"],
-        input[type="date"],
-        input[type="datetime-local"],
-        select,
-        textarea {
-            border:
-                1px solid var(--admin-border) !important;
+    font-weight: 600;
 
-            border-radius: 8px !important;
+    text-decoration: none;
 
-            padding: 9px 11px !important;
+}
 
-            background: white !important;
 
-            color: var(--admin-text) !important;
-        }
+#user-tools a:hover {
 
+    text-decoration: underline;
 
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color:
-                var(--primary) !important;
+}
 
-            box-shadow:
-                0 0 0 3px
-                rgba(99, 102, 241, 0.10) !important;
-        }
 
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
 
-        /* =====================================================
-           BREADCRUMBS
-           ===================================================== */
+#content {
 
-        .breadcrumbs {
-            background: white;
+    padding: 28px;
 
-            border-bottom:
-                1px solid var(--admin-border);
+    max-width: 1450px;
 
-            color: var(--admin-muted);
+}
 
-            padding: 12px 24px;
-        }
 
+#content-main {
 
-        .breadcrumbs a {
-            color: var(--primary);
-        }
+    width: 100%;
 
+}
 
-        /* =====================================================
-           MESSAGES
-           ===================================================== */
 
-        .messagelist {
-            margin-left: 0;
-            margin-right: 0;
-        }
+/* =========================================================
+   BREADCRUMBS
+   ========================================================= */
 
+div.breadcrumbs {
 
-        .messagelist li {
-            border-radius: 9px;
+    background: #ffffff !important;
 
-            margin-bottom: 8px;
-        }
+    border: 1px solid var(--et-border);
 
+    border-radius: 11px;
 
-        /* =====================================================
-           FILTER SIDEBAR
-           ===================================================== */
+    padding: 11px 15px;
 
-        #changelist-filter {
-            background: white;
+    margin-bottom: 22px;
 
-            border-left:
-                1px solid var(--admin-border);
+    color: var(--et-text-secondary) !important;
 
-            border-radius: 10px;
-        }
+    box-shadow: var(--et-shadow-sm);
 
+}
 
-        #changelist-filter h2 {
-            background: #f8fafc;
 
-            color: #374151;
-        }
+div.breadcrumbs a {
 
+    color: var(--et-primary) !important;
 
-        /* =====================================================
-           ACTION BAR
-           ===================================================== */
+    font-weight: 600;
 
-        .actions {
-            background: #f8fafc;
+}
 
-            border:
-                1px solid var(--admin-border);
 
-            border-radius: 9px;
-        }
+/* =========================================================
+   MODULE CARDS
+   ========================================================= */
 
+.module {
 
-        /* =====================================================
-           RESPONSIVE
-           ===================================================== */
+    background: #ffffff !important;
 
-        @media (max-width: 768px) {
+    color: var(--et-text) !important;
 
-            #content {
-                padding: 18px;
-            }
+    border: 1px solid var(--et-border);
 
+    border-radius: 16px;
 
-            #header {
-                padding:
-                    12px 16px;
-            }
+    overflow: hidden;
 
+    margin-bottom: 22px;
 
-            #site-name a {
-                font-size: 18px;
-            }
+    box-shadow: var(--et-shadow-sm);
 
-        }
+}
 
-    </style>
+
+.module:hover {
+
+    box-shadow: var(--et-shadow-md);
+
+}
+
+
+/* Module headers */
+
+.module caption,
+.module h2 {
+
+    background: #f8fafc !important;
+
+    color: var(--et-text) !important;
+
+    padding: 15px 18px;
+
+    border-bottom: 1px solid var(--et-border);
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+}
+
+
+.module caption a,
+.module h2 a {
+
+    color: var(--et-text) !important;
+
+}
+
+
+/* =========================================================
+   DASHBOARD MODEL ROWS
+   ========================================================= */
+
+#content-main .module table {
+
+    width: 100%;
+
+    background: #ffffff !important;
+
+}
+
+
+#content-main .module table tbody {
+
+    background: #ffffff !important;
+
+}
+
+
+#content-main .module table tr {
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+}
+
+
+#content-main .module table tr:hover {
+
+    background: #fafbff !important;
+
+}
+
+
+#content-main .module table th,
+#content-main .module table td {
+
+    padding: 13px 16px;
+
+    font-size: 13px;
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+    border-bottom: 1px solid #eef0f3 !important;
+
+}
+
+
+#content-main .module table tr:last-child th,
+#content-main .module table tr:last-child td {
+
+    border-bottom: none !important;
+
+}
+
+
+/* Model names */
+
+#content-main .module table th a {
+
+    color: #374151 !important;
+
+    font-weight: 700;
+
+}
+
+
+/* Add / Change links */
+
+#content-main .module table td a {
+
+    color: var(--et-primary) !important;
+
+    font-weight: 600;
+
+}
+
+
+#content-main .module table td a:hover {
+
+    color: var(--et-primary-dark) !important;
+
+}
+
+
+/* =========================================================
+   RECENT ACTIONS
+   ========================================================= */
+
+#recent-actions-module {
+
+    width: 320px !important;
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+    border: 1px solid var(--et-border) !important;
+
+    border-radius: 16px !important;
+
+    overflow: hidden !important;
+
+    box-shadow: var(--et-shadow-sm) !important;
+
+    margin-bottom: 22px !important;
+
+    padding-bottom: 6px !important;
+
+}
+
+
+/* Recent actions heading */
+
+#recent-actions-module h2 {
+
+    margin: 0 !important;
+
+    padding: 16px 18px !important;
+
+    background: #f8fafc !important;
+
+    color: var(--et-text) !important;
+
+    border-bottom: 1px solid var(--et-border) !important;
+
+    font-size: 17px !important;
+
+    font-weight: 700 !important;
+
+}
+
+
+/* My actions heading */
+
+#recent-actions-module h3 {
+
+    margin: 0 !important;
+
+    padding: 15px 18px 8px !important;
+
+    background: #ffffff !important;
+
+    color: var(--et-text-secondary) !important;
+
+    font-size: 11px !important;
+
+    font-weight: 700 !important;
+
+    text-transform: uppercase !important;
+
+    letter-spacing: 0.4px !important;
+
+}
+
+
+/* Action list */
+
+#recent-actions-module .actionlist {
+
+    margin: 0 !important;
+
+    padding: 0 18px 8px !important;
+
+    background: #ffffff !important;
+
+}
+
+
+/* Individual action */
+
+#recent-actions-module .actionlist li {
+
+    margin: 0 !important;
+
+    padding: 10px 0 !important;
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+    border-bottom: 1px solid #eef0f3 !important;
+
+    line-height: 1.35 !important;
+
+}
+
+
+/* Last action */
+
+#recent-actions-module .actionlist li:last-child {
+
+    border-bottom: none !important;
+
+}
+
+
+/* Action links */
+
+#recent-actions-module .actionlist li a {
+
+    color: var(--et-primary) !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    text-decoration: none !important;
+
+}
+
+
+#recent-actions-module .actionlist li a:hover {
+
+    color: var(--et-primary-dark) !important;
+
+    text-decoration: underline !important;
+
+}
+
+
+/* Object type */
+
+#recent-actions-module .mini.quiet {
+
+    display: block !important;
+
+    margin-top: 3px !important;
+
+    color: var(--et-text-muted) !important;
+
+    font-size: 10px !important;
+
+}
+
+
+/* Recent actions internal elements */
+
+#recent-actions-module ul,
+#recent-actions-module li,
+#recent-actions-module p {
+
+    box-sizing: border-box !important;
+
+}
+
+
+/* Remove default dark backgrounds */
+
+#recent-actions-module,
+#recent-actions-module ul,
+#recent-actions-module li,
+#recent-actions-module .module {
+
+    background-color: #ffffff !important;
+
+}
+
+
+/* Responsive */
+
+@media (max-width: 1100px) {
+
+    #recent-actions-module {
+
+        width: 100% !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHANGE LIST TABLE
+   ========================================================= */
+
+#changelist {
+
+    background: transparent !important;
+
+}
+
+
+#result_list {
+
+    width: 100%;
+
+    background: #ffffff !important;
+
+    border: none;
+
+}
+
+
+#result_list thead {
+
+    background: #f8fafc !important;
+
+}
+
+
+#result_list thead th {
+
+    background: #f8fafc !important;
+
+    color: #64748b !important;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.35px;
+
+    padding: 13px 14px;
+
+    border-bottom: 1px solid var(--et-border);
+
+}
+
+
+#result_list tbody {
+
+    background: #ffffff !important;
+
+}
+
+
+#result_list tbody tr {
+
+    background: #ffffff !important;
+
+}
+
+
+#result_list tbody tr:hover {
+
+    background: #fafbff !important;
+
+}
+
+
+#result_list tbody td,
+#result_list tbody th {
+
+    padding: 12px 14px;
+
+    font-size: 13px;
+
+    color: var(--et-text) !important;
+
+    background: #ffffff !important;
+
+    border-bottom: 1px solid #eef0f3 !important;
+
+}
+
+
+#result_list tbody tr:last-child td,
+#result_list tbody tr:last-child th {
+
+    border-bottom: none !important;
+
+}
+
+
+#result_list a {
+
+    color: var(--et-primary) !important;
+
+    font-weight: 600;
+
+}
+
+
+#result_list a:hover {
+
+    color: var(--et-primary-dark) !important;
+
+}
+
+
+/* =========================================================
+   SEARCH BAR
+   ========================================================= */
+
+#toolbar {
+
+    background: #ffffff !important;
+
+    border: 1px solid var(--et-border);
+
+    border-radius: 14px;
+
+    padding: 15px;
+
+    margin-bottom: 18px;
+
+    box-shadow: var(--et-shadow-sm);
+
+}
+
+
+#toolbar input[type="text"] {
+
+    border: 1px solid var(--et-border) !important;
+
+    border-radius: 9px !important;
+
+    padding: 10px 12px !important;
+
+    min-height: 40px;
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+}
+
+
+#toolbar input[type="submit"] {
+
+    min-height: 40px;
+
+}
+
+
+/* =========================================================
+   FORMS
+   ========================================================= */
+
+fieldset.module {
+
+    background: #ffffff !important;
+
+}
+
+
+input,
+textarea,
+select {
+
+    border: 1px solid var(--et-border) !important;
+
+    border-radius: 9px !important;
+
+    background: #ffffff !important;
+
+    color: var(--et-text) !important;
+
+    box-sizing: border-box;
+
+}
+
+
+input:focus,
+textarea:focus,
+select:focus {
+
+    border-color: var(--et-primary) !important;
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.10) !important;
+
+    outline: none !important;
+
+}
+
+
+.aligned label {
+
+    color: #374151 !important;
+
+    font-size: 13px;
+
+    font-weight: 650;
+
+}
+
+
+.help,
+p.help {
+
+    color: var(--et-text-muted) !important;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+input[type="submit"],
+.button,
+button,
+a.button {
+
+    border-radius: 9px !important;
+
+    font-size: 12px !important;
+
+    font-weight: 650 !important;
+
+    transition: 0.2s ease;
+
+}
+
+
+input[type="submit"] {
+
+    background: var(--et-primary) !important;
+
+    color: #ffffff !important;
+
+    border: none !important;
+
+}
+
+
+input[type="submit"]:hover {
+
+    background: var(--et-primary-dark) !important;
+
+    transform: translateY(-1px);
+
+}
+
+
+.submit-row {
+
+    background: #ffffff !important;
+
+    border: 1px solid var(--et-border);
+
+    border-radius: 13px;
+
+    padding: 15px;
+
+    margin-top: 18px;
+
+}
+
+
+.submit-row input {
+
+    min-height: 40px;
+
+}
+
+
+/* =========================================================
+   OBJECT TOOLS
+   ========================================================= */
+
+.object-tools a {
+
+    background: var(--et-primary) !important;
+
+    color: #ffffff !important;
+
+    border-radius: 9px !important;
+
+    padding: 9px 14px !important;
+
+    font-size: 12px !important;
+
+    font-weight: 650 !important;
+
+    box-shadow: none !important;
+
+}
+
+
+.object-tools a:hover {
+
+    background: var(--et-primary-dark) !important;
+
+}
+
+
+/* =========================================================
+   FILTER PANEL
+   ========================================================= */
+
+#changelist-filter {
+
+    background: #ffffff !important;
+
+    border: 1px solid var(--et-border);
+
+    border-radius: 14px;
+
+    box-shadow: var(--et-shadow-sm);
+
+    overflow: hidden;
+
+}
+
+
+#changelist-filter h2 {
+
+    background: #f8fafc !important;
+
+    color: var(--et-text) !important;
+
+    font-size: 13px;
+
+    border-bottom: 1px solid var(--et-border);
+
+}
+
+
+#changelist-filter h3 {
+
+    color: #64748b !important;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+}
+
+
+#changelist-filter li {
+
+    background: #ffffff !important;
+
+}
+
+
+#changelist-filter li.selected a {
+
+    color: var(--et-primary) !important;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   ACTION BAR
+   ========================================================= */
+
+.actions {
+
+    background: #f8fafc !important;
+
+    border: 1px solid var(--et-border);
+
+    border-radius: 11px;
+
+    margin-bottom: 14px;
+
+    padding: 10px;
+
+}
+
+
+.actions select {
+
+    min-height: 36px;
+
+}
+
+
+.actions button {
+
+    min-height: 36px;
+
+    background: var(--et-primary) !important;
+
+    color: #ffffff !important;
+
+    border: none;
+
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.paginator {
+
+    margin-top: 15px;
+
+    color: var(--et-text-secondary) !important;
+
+    font-size: 12px;
+
+}
+
+
+.paginator a {
+
+    color: var(--et-primary) !important;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   MESSAGES
+   ========================================================= */
+
+ul.messagelist {
+
+    margin-bottom: 20px;
+
+}
+
+
+ul.messagelist li {
+
+    border-radius: 11px;
+
+    border: 1px solid var(--et-border);
+
+    box-shadow: var(--et-shadow-sm);
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+body.login {
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5f7fb,
+            #eef2ff
+        ) !important;
+
+}
+
+
+body.login #container {
+
+    background: transparent !important;
+
+}
+
+
+body.login #header {
+
+    justify-content: center;
+
+    border-radius: 0 0 18px 18px;
+
+}
+
+
+body.login #content-main {
+
+    background: #ffffff !important;
+
+    border: 1px solid var(--et-border);
+
+    border-radius: 18px;
+
+    padding: 30px;
+
+    box-shadow: var(--et-shadow-md);
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    #header {
+
+        padding: 0 15px;
+
+    }
+
+    #content {
+
+        padding: 20px 12px;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    #branding h1 {
+
+        font-size: 18px;
+
+    }
+
+    #user-tools {
+
+        font-size: 10px;
+
+    }
+
+    #recent-actions-module {
+
+        width: 100% !important;
+
+    }
+
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block branding %}
+
+<h1 id="site-name">
+
+    <a href="{% url 'admin:index' %}">
+        Expense Tracker
+    </a>
+
+</h1>
 
 {% endblock %}
