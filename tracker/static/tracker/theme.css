@@ -1,0 +1,293 @@
+/* =========================================================
+   EXPENSE TRACKER — GLOBAL THEME
+   ========================================================= */
+
+:root {
+    color-scheme: light;
+
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --surface-soft: #f8fafc;
+    --text: #172033;
+    --text-soft: #64748b;
+    --border: #e2e8f0;
+    --input-bg: #ffffff;
+    --input-border: #d9e2ec;
+    --link: #2563eb;
+
+    --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================================
+   DARK MODE
+   ========================================================= */
+
+html[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0b1020;
+    --surface: #151b2d;
+    --surface-soft: #1b2338;
+    --text: #f8fafc;
+    --text-soft: #a7b0c2;
+    --border: #2b354d;
+    --input-bg: #101728;
+    --input-border: #34405a;
+    --link: #7db1ff;
+
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.20);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.28);
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+html,
+body {
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease;
+}
+
+html[data-theme="dark"] body {
+    background:
+        radial-gradient(
+            circle at top left,
+            rgba(70, 100, 180, 0.10),
+            transparent 30%
+        ),
+        var(--bg) !important;
+
+    color: var(--text) !important;
+}
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6 {
+    color: var(--text) !important;
+}
+
+html[data-theme="dark"] p,
+html[data-theme="dark"] small,
+html[data-theme="dark"] label {
+    color: var(--text-soft);
+}
+
+html[data-theme="dark"] strong,
+html[data-theme="dark"] b {
+    color: var(--text);
+}
+
+/* =========================================================
+   COMMON CARDS / PANELS
+   ========================================================= */
+
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .box,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .content,
+html[data-theme="dark"] .section,
+html[data-theme="dark"] .form-container,
+html[data-theme="dark"] .table-container,
+html[data-theme="dark"] .stat-card,
+html[data-theme="dark"] .budget-card,
+html[data-theme="dark"] .report-card {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+    box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   AUTH / FORM AREAS
+   ========================================================= */
+
+html[data-theme="dark"] form {
+    color: var(--text);
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+    background: var(--input-bg) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--input-border) !important;
+    box-shadow: none !important;
+}
+
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus {
+    border-color: #5f8fe8 !important;
+    box-shadow: 0 0 0 3px rgba(95, 143, 232, 0.15) !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+    color: #778198 !important;
+}
+
+/* Django form error messages */
+html[data-theme="dark"] .errorlist {
+    color: #ff8d8d !important;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+html[data-theme="dark"] table {
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+html[data-theme="dark"] th {
+    background: var(--surface-soft) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+html[data-theme="dark"] td {
+    color: var(--text-soft) !important;
+    border-color: var(--border) !important;
+}
+
+html[data-theme="dark"] tr {
+    background: transparent !important;
+}
+
+html[data-theme="dark"] tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025) !important;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+html[data-theme="dark"] a {
+    color: var(--link);
+}
+
+html[data-theme="dark"] a:hover {
+    color: #a8c9ff;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+html[data-theme="dark"] nav,
+html[data-theme="dark"] .navbar,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .nav-bar {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+html[data-theme="dark"] button {
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+/*
+   Don't force every button to the same color.
+   Existing project button colors should remain intact.
+*/
+
+/* =========================================================
+   DIVIDERS
+   ========================================================= */
+
+html[data-theme="dark"] hr {
+    border-color: var(--border) !important;
+}
+
+/* =========================================================
+   ALERTS / MESSAGES
+   ========================================================= */
+
+html[data-theme="dark"] .alert,
+html[data-theme="dark"] .message,
+html[data-theme="dark"] .messages {
+    border-color: var(--border);
+}
+
+/* =========================================================
+   THEME TOGGLE
+   ========================================================= */
+
+.theme-toggle {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+
+    width: 50px;
+    height: 50px;
+
+    border: 1px solid var(--border);
+    border-radius: 50%;
+
+    background: var(--surface);
+    color: var(--text);
+
+    box-shadow: var(--shadow-md);
+
+    cursor: pointer;
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 20px;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.25s ease;
+}
+
+.theme-toggle:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+}
+
+.theme-toggle:active {
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+html[data-theme="dark"] ::-webkit-scrollbar {
+    width: 10px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: var(--bg);
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #33405a;
+    border-radius: 10px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #465673;
+}

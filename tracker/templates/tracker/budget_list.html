@@ -20,6 +20,12 @@
         href="{% static 'tracker/css/style.css' %}"
     >
 
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
     <!-- Expense Tracker Favicon -->
     <link
         rel="icon"
@@ -32,7 +38,12 @@
         href="{% static 'tracker/favicon.png' %}?v=3"
     >
 
+
     <style>
+
+        /* =====================================================
+           PAGE
+           ===================================================== */
 
         body {
             background: #f5f7fb;
@@ -49,7 +60,9 @@
         }
 
 
-        /* ================= HEADER ================= */
+        /* =====================================================
+           HEADER
+           ===================================================== */
 
         .topbar {
             display: flex;
@@ -57,13 +70,13 @@
             justify-content: space-between;
 
             gap: 20px;
-
             margin-bottom: 25px;
         }
 
         .page-title h1 {
             font-size: 30px;
             margin-bottom: 5px;
+            color: #111827;
         }
 
         .page-title p {
@@ -78,8 +91,10 @@
 
         .top-btn {
             display: inline-flex;
+
             align-items: center;
             justify-content: center;
+
             gap: 7px;
 
             padding: 11px 16px;
@@ -96,28 +111,39 @@
 
             box-shadow: var(--shadow-sm);
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                color 0.25s ease;
         }
 
         .top-btn:hover {
             transform: translateY(-1px);
+
             border-color: #6366f1;
+
             color: #4f46e5;
         }
 
         .top-btn.primary {
             background: #6366f1;
+
             border-color: #6366f1;
+
             color: white;
         }
 
         .top-btn.primary:hover {
             background: #4f46e5;
+
             color: white;
         }
 
 
-        /* ================= BUDGET GRID ================= */
+        /* =====================================================
+           BUDGET GRID
+           ===================================================== */
 
         .budget-grid {
             display: grid;
@@ -128,31 +154,42 @@
             gap: 20px;
         }
 
+
         .budget-card {
             background: white;
 
             border: 1px solid #e5e7eb;
+
             border-radius: 18px;
 
             padding: 24px;
 
             box-shadow: var(--shadow-sm);
 
-            transition: 0.25s ease;
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
+
 
         .budget-card:hover {
             transform: translateY(-3px);
+
             box-shadow: var(--shadow-md);
         }
 
 
-        /* ================= CARD HEADER ================= */
+        /* =====================================================
+           CARD HEADER
+           ===================================================== */
 
         .budget-header {
             display: flex;
 
             align-items: flex-start;
+
             justify-content: space-between;
 
             gap: 15px;
@@ -160,40 +197,56 @@
             margin-bottom: 22px;
         }
 
+
         .category-section {
             display: flex;
+
             align-items: center;
+
             gap: 12px;
         }
+
 
         .category-icon {
             width: 44px;
             height: 44px;
 
             display: flex;
+
             align-items: center;
             justify-content: center;
 
             border-radius: 11px;
 
             background: #eef2ff;
+
             color: #4f46e5;
 
             font-size: 19px;
+
+            flex-shrink: 0;
         }
+
 
         .category-section h2 {
             font-size: 17px;
+
             margin-bottom: 2px;
+
+            color: #111827;
         }
+
 
         .period {
             color: #9ca3af;
+
             font-size: 12px;
         }
 
 
-        /* ================= STATUS ================= */
+        /* =====================================================
+           STATUS
+           ===================================================== */
 
         .status {
             padding: 6px 10px;
@@ -201,23 +254,30 @@
             border-radius: 20px;
 
             font-size: 11px;
+
             font-weight: 700;
 
             white-space: nowrap;
         }
 
+
         .status-safe {
             background: #d1fae5;
+
             color: #047857;
         }
 
+
         .status-warning {
             background: #fee2e2;
+
             color: #b91c1c;
         }
 
 
-        /* ================= AMOUNTS ================= */
+        /* =====================================================
+           AMOUNTS
+           ===================================================== */
 
         .amount-grid {
             display: grid;
@@ -230,13 +290,19 @@
             margin-bottom: 22px;
         }
 
+
         .amount-box {
             padding: 13px 12px;
 
             border-radius: 10px;
 
             background: #f8fafc;
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
+
 
         .amount-label {
             display: block;
@@ -254,52 +320,68 @@
             letter-spacing: 0.3px;
         }
 
+
         .amount-value {
             font-size: 15px;
+
             font-weight: 700;
         }
+
 
         .limit-value {
             color: #374151;
         }
 
+
         .spent-value {
             color: #dc2626;
         }
+
 
         .remaining-value {
             color: #059669;
         }
 
 
-        /* ================= PROGRESS ================= */
+        /* =====================================================
+           PROGRESS
+           ===================================================== */
 
         .progress-section {
             margin-bottom: 20px;
         }
 
+
         .progress-top {
             display: flex;
 
             align-items: center;
+
             justify-content: space-between;
 
             margin-bottom: 8px;
         }
 
+
         .progress-label {
             color: #6b7280;
+
             font-size: 12px;
         }
+
 
         .progress-value {
             color: #374151;
+
             font-size: 12px;
+
             font-weight: 700;
         }
 
+
         .progress-track {
             width: 100%;
+
             height: 8px;
 
             background: #eef2f7;
@@ -308,6 +390,7 @@
 
             overflow: hidden;
         }
+
 
         .progress-bar {
             height: 100%;
@@ -319,12 +402,15 @@
             transition: width 0.4s ease;
         }
 
+
         .progress-bar.exceeded {
             background: #ef4444;
         }
 
 
-        /* ================= DATE ================= */
+        /* =====================================================
+           DATE
+           ===================================================== */
 
         .date-range {
             padding: 12px 13px;
@@ -338,14 +424,21 @@
             color: #6b7280;
 
             font-size: 11px;
+
+            transition:
+                background-color 0.25s ease,
+                color 0.25s ease;
         }
+
 
         .date-range strong {
             color: #374151;
         }
 
 
-        /* ================= ACTIONS ================= */
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
 
         .card-actions {
             display: flex;
@@ -355,12 +448,17 @@
             padding-top: 16px;
 
             border-top: 1px solid #eef0f3;
+
+            transition:
+                border-color 0.25s ease;
         }
+
 
         .edit-btn {
             display: inline-flex;
 
             align-items: center;
+
             justify-content: center;
 
             padding: 9px 14px;
@@ -372,22 +470,28 @@
             border-radius: 8px;
 
             font-size: 12px;
+
             font-weight: 600;
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease;
         }
+
 
         .edit-btn:hover {
             background: #e0e7ff;
         }
 
 
-        /* ================= EMPTY STATE ================= */
+        /* =====================================================
+           EMPTY STATE
+           ===================================================== */
 
         .empty-card {
             background: white;
 
             border: 1px solid #e5e7eb;
+
             border-radius: 18px;
 
             padding: 70px 25px;
@@ -395,13 +499,19 @@
             text-align: center;
 
             box-shadow: var(--shadow-sm);
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
+
 
         .empty-icon {
             width: 70px;
             height: 70px;
 
             display: flex;
+
             align-items: center;
             justify-content: center;
 
@@ -414,10 +524,15 @@
             font-size: 30px;
         }
 
+
         .empty-card h2 {
             font-size: 19px;
+
             margin-bottom: 7px;
+
+            color: #111827;
         }
+
 
         .empty-card p {
             color: #9ca3af;
@@ -428,7 +543,9 @@
         }
 
 
-        /* ================= FOOTER ================= */
+        /* =====================================================
+           FOOTER
+           ===================================================== */
 
         .footer-links {
             display: flex;
@@ -438,21 +555,231 @@
             margin-top: 20px;
         }
 
+
         .footer-link {
             color: #6b7280;
 
             font-size: 13px;
+
             font-weight: 600;
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease;
         }
+
 
         .footer-link:hover {
             color: #4f46e5;
         }
 
 
-        /* ================= RESPONSIVE ================= */
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                #0b1020;
+        }
+
+
+        html[data-theme="dark"] .page-title h1 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .page-title p {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .top-btn:not(.primary) {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .top-btn:not(.primary):hover {
+            background: #1a2235;
+
+            border-color: #6366f1;
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .budget-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+
+            box-shadow:
+                0 12px 30px
+                rgba(0, 0, 0, 0.22);
+        }
+
+
+        html[data-theme="dark"] .budget-card:hover {
+            border-color: #3b4762;
+        }
+
+
+        html[data-theme="dark"] .category-icon {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .category-section h2 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .period {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .status-safe {
+            background:
+                rgba(16, 185, 129, 0.14);
+
+            color: #6ee7b7;
+        }
+
+
+        html[data-theme="dark"] .status-warning {
+            background:
+                rgba(239, 68, 68, 0.14);
+
+            color: #fca5a5;
+        }
+
+
+        html[data-theme="dark"] .amount-box {
+            background: #0f1728;
+        }
+
+
+        html[data-theme="dark"] .amount-label {
+            color: #7f8aa0;
+        }
+
+
+        html[data-theme="dark"] .limit-value {
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .spent-value {
+            color: #f87171;
+        }
+
+
+        html[data-theme="dark"] .remaining-value {
+            color: #34d399;
+        }
+
+
+        html[data-theme="dark"] .progress-label {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .progress-value {
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .progress-track {
+            background: #293349;
+        }
+
+
+        html[data-theme="dark"] .date-range {
+            background: #0f1728;
+
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .date-range strong {
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .card-actions {
+            border-top-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .edit-btn {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .edit-btn:hover {
+            background:
+                rgba(99, 102, 241, 0.24);
+        }
+
+
+        html[data-theme="dark"] .empty-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .empty-card h2 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .empty-icon {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .footer-link {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .footer-link:hover {
+            color: #a5b4fc;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
 
         @media (max-width: 850px) {
 
@@ -469,30 +796,39 @@
                 padding: 20px 12px;
             }
 
+
             .page-container {
                 width: 100%;
             }
 
+
             .topbar {
                 flex-direction: column;
+
                 align-items: flex-start;
             }
+
 
             .top-actions {
                 width: 100%;
             }
 
+
             .top-btn {
                 flex: 1;
             }
+
 
             .amount-grid {
                 grid-template-columns: 1fr;
             }
 
+
             .footer-links {
                 flex-direction: column;
+
                 align-items: center;
+
                 gap: 12px;
             }
 
@@ -505,6 +841,7 @@
 
 <body>
 
+
 <div class="page">
 
     <div class="page-container">
@@ -513,6 +850,7 @@
         <!-- ================= HEADER ================= -->
 
         <div class="topbar">
+
 
             <div class="page-title">
 
@@ -547,8 +885,8 @@
 
             </div>
 
-        </div>
 
+        </div>
 
 
         <!-- ================= BUDGETS ================= -->
@@ -560,6 +898,7 @@
 
                 {% for budget in budgets %}
 
+
                     <div class="budget-card">
 
 
@@ -569,6 +908,7 @@
 
 
                             <div class="category-section">
+
 
                                 <div class="category-icon">
                                     🎯
@@ -588,8 +928,8 @@
 
                                 </div>
 
-                            </div>
 
+                            </div>
 
 
                             <!-- STATUS -->
@@ -620,7 +960,6 @@
 
 
                         </div>
-
 
 
                         <!-- AMOUNTS -->
@@ -688,7 +1027,6 @@
                         </div>
 
 
-
                         <!-- PROGRESS -->
 
                         <div class="progress-section">
@@ -703,7 +1041,6 @@
 
                                 <span class="progress-value">
 
-
                                     {% if budget.limit > 0 %}
 
                                         {% widthratio budget.spent budget.limit 100 %}%
@@ -713,7 +1050,6 @@
                                         0%
 
                                     {% endif %}
-
 
                                 </span>
 
@@ -756,7 +1092,6 @@
                         </div>
 
 
-
                         <!-- DATE RANGE -->
 
                         <div class="date-range">
@@ -774,11 +1109,9 @@
                         </div>
 
 
-
                         <!-- ACTION -->
 
                         <div class="card-actions">
-
 
                             <a
                                 href="{% url 'edit_budget' budget.id %}"
@@ -787,11 +1120,11 @@
                                 ✎ Edit Budget
                             </a>
 
-
                         </div>
 
 
                     </div>
+
 
                 {% endfor %}
 
@@ -837,7 +1170,6 @@
         {% endif %}
 
 
-
         <!-- ================= FOOTER ================= -->
 
         <div class="footer-links">
@@ -865,6 +1197,10 @@
     </div>
 
 </div>
+
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 
 </body>

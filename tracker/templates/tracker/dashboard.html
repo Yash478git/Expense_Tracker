@@ -19,6 +19,12 @@
         href="{% static 'tracker/css/style.css' %}"
     >
 
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
     <!-- Expense Tracker Favicon -->
     <link
         rel="icon"
@@ -35,7 +41,12 @@
         src="https://cdn.jsdelivr.net/npm/chart.js"
     ></script>
 
+
     <style>
+
+        /* =====================================================
+           PAGE
+           ===================================================== */
 
         body {
             background: #f5f7fb;
@@ -132,7 +143,6 @@
 
         .nav-link:hover {
             background: #1f2937;
-
             color: white;
 
             transform: translateX(2px);
@@ -211,6 +221,69 @@
             color: #374151;
 
             box-shadow: var(--shadow-sm);
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                color 0.25s ease;
+        }
+
+
+        /* =====================================================
+           DASHBOARD THEME BUTTON
+           ===================================================== */
+
+        .theme-toggle {
+            position: static;
+
+            width: auto;
+            height: auto;
+
+            min-height: 40px;
+
+            padding: 0 13px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+
+            background: white;
+            color: #374151;
+
+            font-family: inherit;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                background-color 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .theme-toggle:hover {
+            border-color: #c7d2fe;
+            color: #4f46e5;
+
+            transform: translateY(-1px);
+        }
+
+
+        .theme-icon {
+            font-size: 15px;
+            line-height: 1;
         }
 
 
@@ -241,7 +314,11 @@
 
             box-shadow: var(--shadow-sm);
 
-            transition: 0.25s ease;
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
 
 
@@ -352,7 +429,11 @@
 
             box-shadow: var(--shadow-sm);
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                color 0.25s ease;
         }
 
 
@@ -428,7 +509,10 @@
 
             box-shadow: var(--shadow-sm);
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
 
 
@@ -474,6 +558,10 @@
             box-shadow: var(--shadow-sm);
 
             overflow: hidden;
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
 
 
@@ -523,7 +611,9 @@
 
             border-bottom: 1px solid #f0f1f3;
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease,
+                background-color 0.25s ease;
         }
 
 
@@ -661,7 +751,8 @@
 
             transition:
                 opacity 0.3s ease,
-                transform 0.3s ease;
+                transform 0.3s ease,
+                background-color 0.25s ease;
         }
 
 
@@ -735,13 +826,11 @@
 
             from {
                 opacity: 0;
-
                 transform: translateX(30px);
             }
 
             to {
                 opacity: 1;
-
                 transform: translateX(0);
             }
 
@@ -749,8 +838,1133 @@
 
 
         /* =====================================================
-           MOBILE
+           FINANCIAL INSIGHTS
            ===================================================== */
+
+        .insights-section {
+            margin-bottom: 25px;
+        }
+
+
+        .insights-header {
+            margin-bottom: 15px;
+        }
+
+
+        .insights-header h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+
+        .insights-header p {
+            color: #9ca3af;
+
+            font-size: 13px;
+
+            margin: 0;
+        }
+
+
+        .insights-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+
+        .insight-card {
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 14px;
+
+            padding: 20px;
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 16px;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease,
+                border-color 0.25s ease,
+                background-color 0.25s ease;
+        }
+
+
+        .insight-card:hover {
+            transform: translateY(-3px);
+
+            border-color: #c7d2fe;
+
+            box-shadow: var(--shadow-md);
+        }
+
+
+        .insight-icon {
+            width: 46px;
+            height: 46px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            border-radius: 12px;
+
+            background: #eef2ff;
+
+            font-size: 21px;
+        }
+
+
+        .insight-content {
+            min-width: 0;
+        }
+
+
+        .insight-label {
+            display: block;
+
+            color: #6b7280;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 6px;
+        }
+
+
+        .insight-value {
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 21px;
+
+            font-weight: 700;
+
+            line-height: 1.25;
+
+            word-break: break-word;
+        }
+
+
+        .insight-description {
+            margin: 6px 0 0;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        .trend-success {
+            color: #059669 !important;
+        }
+
+
+        .trend-warning {
+            color: #d97706 !important;
+        }
+
+
+        .trend-neutral {
+            color: #6b7280 !important;
+        }
+
+
+        /* =====================================================
+           DASHBOARD TIME FILTER
+           ===================================================== */
+
+        .dashboard-filter-card {
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 16px;
+
+            padding: 20px 22px;
+
+            margin-bottom: 25px;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                0.25s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+
+        .dashboard-filter-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+
+        .filter-heading {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .filter-heading h2 {
+            margin: 0 0 4px;
+
+            font-size: 17px;
+        }
+
+
+        .filter-heading p {
+            margin: 0;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+        }
+
+
+        .filter-icon {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 11px;
+
+            background: #eef2ff;
+
+            font-size: 19px;
+        }
+
+
+        .dashboard-filter-form {
+            display: flex;
+
+            align-items: flex-end;
+
+            flex-wrap: wrap;
+
+            gap: 14px;
+        }
+
+
+        .filter-group {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 6px;
+        }
+
+
+        .filter-group label {
+            color: #6b7280;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+        }
+
+
+        .filter-group select,
+        .filter-group input {
+            min-width: 180px;
+
+            height: 42px;
+
+            padding: 0 13px;
+
+            background: #f9fafb;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 9px;
+
+            color: #374151;
+
+            font-size: 13px;
+
+            outline: none;
+
+            transition: 0.2s ease;
+
+            font-family: inherit;
+        }
+
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: #6366f1;
+
+            background: white;
+
+            box-shadow:
+                0 0 0 3px rgba(99, 102, 241, 0.10);
+        }
+
+
+        .custom-date-fields {
+            display: flex;
+
+            align-items: flex-end;
+
+            flex-wrap: wrap;
+
+            gap: 14px;
+
+            width: 100%;
+        }
+
+
+        .apply-filter-btn {
+            height: 42px;
+
+            padding: 0 18px;
+
+            border: none;
+
+            border-radius: 9px;
+
+            background: #6366f1;
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.2s ease;
+
+            font-family: inherit;
+        }
+
+
+        .apply-filter-btn:hover {
+            background: #4f46e5;
+
+            transform: translateY(-1px);
+        }
+
+
+        .selected-period-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding: 6px 10px;
+
+            margin-top: 10px;
+
+            border-radius: 999px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 11px;
+
+            font-weight: 700;
+        }
+
+
+        /* =====================================================
+           BUDGET PROGRESS
+           ===================================================== */
+
+        .budget-progress-section {
+            margin-bottom: 25px;
+        }
+
+
+        .budget-progress-header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .budget-progress-header h2 {
+            margin: 0 0 4px;
+
+            font-size: 20px;
+        }
+
+
+        .budget-progress-header p {
+            margin: 0;
+
+            color: #9ca3af;
+
+            font-size: 13px;
+        }
+
+
+        .budget-count-badge {
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-width: 34px;
+
+            height: 30px;
+
+            padding: 0 10px;
+
+            border-radius: 999px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+
+        .budget-progress-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+
+        .budget-progress-card {
+            padding: 20px;
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 16px;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                0.25s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+
+        .budget-progress-card:hover {
+            transform: translateY(-3px);
+
+            box-shadow: var(--shadow-md);
+        }
+
+
+        .budget-progress-top {
+            display: flex;
+
+            align-items: flex-start;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .budget-progress-name {
+            min-width: 0;
+        }
+
+
+        .budget-progress-name h3 {
+            margin: 0;
+
+            font-size: 15px;
+
+            font-weight: 700;
+
+            color: #111827;
+
+            word-break: break-word;
+        }
+
+
+        .budget-progress-name span {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+        }
+
+
+        .budget-progress-percent {
+            flex-shrink: 0;
+
+            font-size: 14px;
+
+            font-weight: 800;
+
+            color: #4f46e5;
+        }
+
+
+        .budget-progress-bar {
+            width: 100%;
+
+            height: 10px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: #eef2f7;
+        }
+
+
+        .budget-progress-fill {
+            height: 100%;
+
+            border-radius: inherit;
+
+            transition: width 0.8s ease;
+        }
+
+
+        .budget-progress-fill.safe {
+            background: #10b981;
+        }
+
+
+        .budget-progress-fill.warning {
+            background: #f59e0b;
+        }
+
+
+        .budget-progress-fill.exceeded {
+            background: #ef4444;
+        }
+
+
+        .budget-progress-bottom {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            margin-top: 12px;
+        }
+
+
+        .budget-amount {
+            color: #6b7280;
+
+            font-size: 12px;
+        }
+
+
+        .budget-amount strong {
+            color: #111827;
+
+            font-weight: 700;
+        }
+
+
+        .budget-status {
+            font-size: 11px;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+
+        .budget-status.safe {
+            color: #059669;
+        }
+
+
+        .budget-status.warning {
+            color: #d97706;
+        }
+
+
+        .budget-status.exceeded {
+            color: #dc2626;
+        }
+
+
+        .no-budget-progress {
+            padding: 35px 25px;
+
+            text-align: center;
+
+            background: white;
+
+            border: 1px dashed #d1d5db;
+
+            border-radius: 16px;
+
+            color: #9ca3af;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           FINANCIAL HEALTH SCORE
+           ===================================================== */
+
+        .health-section {
+            margin-bottom: 25px;
+        }
+
+
+        .health-card {
+            display: grid;
+
+            grid-template-columns: 250px 1fr;
+
+            gap: 28px;
+
+            align-items: center;
+
+            padding: 25px;
+
+            background: white;
+
+            border: 1px solid #e5e7eb;
+
+            border-radius: 18px;
+
+            box-shadow: var(--shadow-sm);
+
+            transition:
+                0.25s ease,
+                background-color 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+
+        .health-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+
+        .health-gauge {
+            width: 190px;
+
+            height: 190px;
+
+            margin: 0 auto;
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        .health-gauge svg {
+            width: 100%;
+
+            height: 100%;
+
+            transform: rotate(-90deg);
+        }
+
+
+        .health-gauge-track {
+            fill: none;
+
+            stroke: #eef2f7;
+
+            stroke-width: 13;
+        }
+
+
+        .health-gauge-progress {
+            fill: none;
+
+            stroke: #6366f1;
+
+            stroke-width: 13;
+
+            stroke-linecap: round;
+
+            stroke-dasharray: 439.8;
+
+            stroke-dashoffset: 439.8;
+
+            transition: stroke-dashoffset 1.1s ease;
+        }
+
+
+        .health-gauge-content {
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+
+        .health-score {
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 38px;
+
+            font-weight: 800;
+
+            line-height: 1;
+        }
+
+
+        .health-score-label {
+            margin-top: 6px;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.5px;
+        }
+
+
+        .health-details {
+            min-width: 0;
+        }
+
+
+        .health-title {
+            margin: 0 0 5px;
+
+            font-size: 20px;
+
+            color: #111827;
+        }
+
+
+        .health-subtitle {
+            margin: 0 0 18px;
+
+            color: #9ca3af;
+
+            font-size: 12px;
+
+            line-height: 1.5;
+        }
+
+
+        .health-status {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 7px 11px;
+
+            margin-bottom: 18px;
+
+            border-radius: 999px;
+
+            background: #eef2ff;
+
+            color: #4f46e5;
+
+            font-size: 11px;
+
+            font-weight: 800;
+        }
+
+
+        .health-metrics {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 10px;
+        }
+
+
+        .health-metric {
+            padding: 12px 13px;
+
+            background: #f9fafb;
+
+            border: 1px solid #eef0f3;
+
+            border-radius: 11px;
+        }
+
+
+        .health-metric-label {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: #9ca3af;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.3px;
+        }
+
+
+        .health-metric-value {
+            margin: 0;
+
+            color: #111827;
+
+            font-size: 18px;
+
+            font-weight: 800;
+        }
+
+
+        .health-note {
+            margin-top: 14px;
+
+            color: #9ca3af;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                #0b1020;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .main-content {
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .sidebar {
+            background:
+                linear-gradient(
+                    180deg,
+                    #101626 0%,
+                    #0c1220 100%
+                );
+        }
+
+
+        html[data-theme="dark"] .welcome p {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .user-badge {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .theme-toggle {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #e5e7eb;
+
+            box-shadow:
+                0 5px 16px rgba(0, 0, 0, 0.20);
+        }
+
+
+        html[data-theme="dark"] .theme-toggle:hover {
+            border-color: #6366f1;
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .summary-card,
+        html[data-theme="dark"] .dashboard-filter-card,
+        html[data-theme="dark"] .insight-card,
+        html[data-theme="dark"] .health-card,
+        html[data-theme="dark"] .budget-progress-card,
+        html[data-theme="dark"] .chart-card,
+        html[data-theme="dark"] .transactions-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.22);
+        }
+
+
+        html[data-theme="dark"] .summary-card:hover,
+        html[data-theme="dark"] .insight-card:hover,
+        html[data-theme="dark"] .budget-progress-card:hover {
+            border-color: #3b4762;
+        }
+
+
+        html[data-theme="dark"] .summary-title,
+        html[data-theme="dark"] .filter-heading p,
+        html[data-theme="dark"] .insights-header p,
+        html[data-theme="dark"] .chart-card p,
+        html[data-theme="dark"] .transaction-date,
+        html[data-theme="dark"] .health-subtitle,
+        html[data-theme="dark"] .health-note,
+        html[data-theme="dark"] .insight-description,
+        html[data-theme="dark"] .budget-progress-name span,
+        html[data-theme="dark"] .budget-amount,
+        html[data-theme="dark"] .no-transactions,
+        html[data-theme="dark"] .filter-group label {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .summary-value,
+        html[data-theme="dark"] .insight-value,
+        html[data-theme="dark"] .health-title,
+        html[data-theme="dark"] .health-score,
+        html[data-theme="dark"] .health-metric-value,
+        html[data-theme="dark"] .budget-progress-name h3,
+        html[data-theme="dark"] .transaction-name,
+        html[data-theme="dark"] .chart-card h2,
+        html[data-theme="dark"] .section-header h2,
+        html[data-theme="dark"] .filter-heading h2,
+        html[data-theme="dark"] .insights-header h2,
+        html[data-theme="dark"] .budget-progress-header h2 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .summary-icon,
+        html[data-theme="dark"] .filter-icon,
+        html[data-theme="dark"] .insight-icon,
+        html[data-theme="dark"] .selected-period-badge,
+        html[data-theme="dark"] .budget-count-badge,
+        html[data-theme="dark"] .health-status {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .action-btn {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .action-btn:hover {
+            border-color: #6366f1;
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .filter-group select,
+        html[data-theme="dark"] .filter-group input {
+            background: #0f1728;
+
+            border-color: #34405a;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .filter-group select:focus,
+        html[data-theme="dark"] .filter-group input:focus {
+            background: #121a2d;
+
+            border-color: #6366f1;
+        }
+
+
+        html[data-theme="dark"] .budget-progress-bar {
+            background: #252e43;
+        }
+
+
+        html[data-theme="dark"] .health-gauge-track {
+            stroke: #293349;
+        }
+
+
+        html[data-theme="dark"] .health-metric {
+            background: #0f1728;
+
+            border-color: #293349;
+        }
+
+
+        html[data-theme="dark"] .transaction-row {
+            border-bottom-color: #293349;
+        }
+
+
+        html[data-theme="dark"] .transaction-row:hover {
+            background: #0f1728;
+        }
+
+
+        html[data-theme="dark"] .transaction-icon {
+            background: #20293c;
+        }
+
+
+        html[data-theme="dark"] .section-header {
+            border-bottom-color: #293349;
+        }
+
+
+        html[data-theme="dark"] .toast {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #f3f4f6;
+        }
+
+
+        html[data-theme="dark"] .toast-close {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .toast-close:hover {
+            background: #252e43;
+
+            color: #f3f4f6;
+        }
+
+
+        html[data-theme="dark"] .budget-alert {
+            background: #2a1b0d;
+
+            border-color: #6b3f16;
+
+            color: #fdba74;
+        }
+
+
+        html[data-theme="dark"] .no-budget-progress {
+            background: #151b2d;
+
+            border-color: #374151;
+
+            color: #8f9ab0;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
+
+        @media (max-width: 1100px) {
+
+            .insights-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
 
         @media (max-width: 1000px) {
 
@@ -761,6 +1975,26 @@
 
             .analytics-grid {
                 grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .budget-progress-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .health-card {
+                grid-template-columns: 1fr;
+            }
+
+
+            .health-metrics {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
             }
 
         }
@@ -812,6 +2046,11 @@
             }
 
 
+            .theme-toggle {
+                width: 100%;
+            }
+
+
             .transaction-row {
                 padding: 15px;
             }
@@ -823,6 +2062,34 @@
                 right: 12px;
 
                 width: calc(100% - 24px);
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .dashboard-filter-form,
+            .custom-date-fields {
+                width: 100%;
+
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .filter-group,
+            .filter-group select,
+            .filter-group input,
+            .apply-filter-btn {
+                width: 100%;
+            }
+
+
+            .filter-group select,
+            .filter-group input {
+                min-width: 0;
             }
 
         }
@@ -868,6 +2135,16 @@
                 align-self: flex-end;
             }
 
+
+            .health-metrics {
+                grid-template-columns: 1fr;
+            }
+
+
+            .health-card {
+                padding: 20px;
+            }
+
         }
 
     </style>
@@ -877,10 +2154,6 @@
 
 <body>
 
-
-<!-- =========================================================
-     GLOBAL TOAST MESSAGES
-     ========================================================= -->
 
 {% if messages %}
 
@@ -919,10 +2192,6 @@
 
 {% endif %}
 
-
-<!-- =========================================================
-     DASHBOARD
-     ========================================================= -->
 
 <div class="dashboard-layout">
 
@@ -1009,6 +2278,15 @@
             >
                 ➕
                 Add Budget
+            </a>
+
+
+            <a
+                href="{% url 'recurring_transaction_list' %}"
+                class="nav-link"
+            >
+                🔄
+                Recurring Transactions
             </a>
 
         </div>
@@ -1098,17 +2376,240 @@
             </div>
 
 
-            <div class="user-badge">
+            <div
+                style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    flex-wrap: wrap;
+                    width: fit-content;
+                    max-width: 100%;
+                "
+            >
 
-                👤
+                <button
+                    type="button"
+                    id="themeToggle"
+                    class="theme-toggle"
+                    aria-label="Toggle dark mode"
+                    aria-pressed="false"
+                >
 
-                {{ request.user.username }}
+                    <span
+                        id="themeIcon"
+                        class="theme-icon"
+                    >
+                        🌙
+                    </span>
+
+
+                    <span id="themeText">
+                        Dark Mode
+                    </span>
+
+                </button>
+
+
+                <div class="user-badge">
+
+                    👤
+
+                    {{ request.user.username }}
+
+                </div>
 
             </div>
 
 
         </div>
 
+
+        <!-- =================================================
+             DASHBOARD TIME FILTER
+             ================================================= -->
+
+        <div class="dashboard-filter-card">
+
+
+            <div class="filter-heading">
+
+                <div>
+
+                    <h2>
+                        Financial Overview
+                    </h2>
+
+
+                    <p>
+                        View your finances for a selected period
+                    </p>
+
+
+                    <div class="selected-period-badge">
+
+                        📅
+
+                        {% if selected_period == 'this_month' %}
+
+                            This Month
+
+                        {% elif selected_period == 'last_month' %}
+
+                            Last Month
+
+                        {% elif selected_period == 'this_year' %}
+
+                            This Year
+
+                        {% elif selected_period == 'last_year' %}
+
+                            Last Year
+
+                        {% else %}
+
+                            Custom Range
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="filter-icon">
+                    📅
+                </div>
+
+            </div>
+
+
+            <form
+                method="GET"
+                class="dashboard-filter-form"
+                id="dashboardFilterForm"
+            >
+
+                <div class="filter-group">
+
+                    <label for="period">
+                        Time Period
+                    </label>
+
+
+                    <select
+                        name="period"
+                        id="period"
+                        onchange="handlePeriodChange(this.value)"
+                    >
+
+                        <option
+                            value="this_month"
+                            {% if selected_period == 'this_month' %}
+                                selected
+                            {% endif %}
+                        >
+                            This Month
+                        </option>
+
+
+                        <option
+                            value="last_month"
+                            {% if selected_period == 'last_month' %}
+                                selected
+                            {% endif %}
+                        >
+                            Last Month
+                        </option>
+
+
+                        <option
+                            value="this_year"
+                            {% if selected_period == 'this_year' %}
+                                selected
+                            {% endif %}
+                        >
+                            This Year
+                        </option>
+
+
+                        <option
+                            value="last_year"
+                            {% if selected_period == 'last_year' %}
+                                selected
+                            {% endif %}
+                        >
+                            Last Year
+                        </option>
+
+
+                        <option
+                            value="custom"
+                            {% if selected_period == 'custom' %}
+                                selected
+                            {% endif %}
+                        >
+                            Custom Range
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div
+                    id="customDateFields"
+                    class="custom-date-fields"
+                    {% if selected_period != 'custom' %}
+                        style="display: none;"
+                    {% endif %}
+                >
+
+                    <div class="filter-group">
+
+                        <label for="date_from">
+                            From
+                        </label>
+
+
+                        <input
+                            type="date"
+                            name="date_from"
+                            id="date_from"
+                            value="{% if filter_start_date %}{{ filter_start_date|date:'Y-m-d' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <div class="filter-group">
+
+                        <label for="date_to">
+                            To
+                        </label>
+
+
+                        <input
+                            type="date"
+                            name="date_to"
+                            id="date_to"
+                            value="{% if filter_end_date %}{{ filter_end_date|date:'Y-m-d' }}{% endif %}"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="apply-filter-btn"
+                    >
+                        Apply Filter
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
 
 
         <!-- =================================================
@@ -1117,8 +2618,6 @@
 
         <div class="summary-grid">
 
-
-            <!-- TOTAL INCOME -->
 
             <div class="summary-card">
 
@@ -1145,9 +2644,6 @@
             </div>
 
 
-
-            <!-- TOTAL EXPENSES -->
-
             <div class="summary-card">
 
                 <div class="summary-top">
@@ -1172,9 +2668,6 @@
 
             </div>
 
-
-
-            <!-- BALANCE -->
 
             <div class="summary-card">
 
@@ -1202,7 +2695,6 @@
 
 
         </div>
-
 
 
         <!-- =================================================
@@ -1251,6 +2743,572 @@
         </div>
 
 
+        <!-- =================================================
+             FINANCIAL INSIGHTS
+             ================================================= -->
+
+        <section class="insights-section">
+
+
+            <div class="insights-header">
+
+                <h2>
+                    🧠 Financial Insights
+                </h2>
+
+                <p>
+                    Smart analysis based on your financial activity
+                </p>
+
+            </div>
+
+
+            <div class="insights-grid">
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        💰
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Savings Rate
+                        </span>
+
+
+                        <h3 class="insight-value">
+                            {{ insights.savings_rate }}%
+                        </h3>
+
+
+                        <p class="insight-description">
+                            of your total income is currently saved.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        🔥
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Top Spending Category
+                        </span>
+
+
+                        <h3 class="insight-value">
+                            {{ insights.top_category_name }}
+                        </h3>
+
+
+                        <p class="insight-description">
+                            ₹{{ insights.top_category_amount|floatformat:2 }}
+                            spent in this category.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        📉
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Highest Expense
+                        </span>
+
+
+                        {% if insights.highest_expense %}
+
+                            <h3 class="insight-value">
+                                ₹{{ insights.highest_expense.amount|floatformat:2 }}
+                            </h3>
+
+
+                            <p class="insight-description">
+                                {{ insights.highest_expense.category.name }}
+                            </p>
+
+                        {% else %}
+
+                            <h3 class="insight-value">
+                                ₹0.00
+                            </h3>
+
+
+                            <p class="insight-description">
+                                No expenses recorded yet.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        📈
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Highest Income
+                        </span>
+
+
+                        {% if insights.highest_income %}
+
+                            <h3 class="insight-value">
+                                ₹{{ insights.highest_income.amount|floatformat:2 }}
+                            </h3>
+
+
+                            <p class="insight-description">
+                                {{ insights.highest_income.category.name }}
+                            </p>
+
+                        {% else %}
+
+                            <h3 class="insight-value">
+                                ₹0.00
+                            </h3>
+
+
+                            <p class="insight-description">
+                                No income recorded yet.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        📊
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Monthly Expense Trend
+                        </span>
+
+
+                        <h3 class="insight-value">
+                            {{ insights.expense_change }}%
+                        </h3>
+
+
+                        {% if insights.expense_change > 0 %}
+
+                            <p class="insight-description trend-warning">
+                                Expenses increased compared with last month.
+                            </p>
+
+                        {% elif insights.expense_change < 0 %}
+
+                            <p class="insight-description trend-success">
+                                Expenses decreased compared with last month.
+                            </p>
+
+                        {% else %}
+
+                            <p class="insight-description trend-neutral">
+                                No significant change from last month.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="insight-card">
+
+                    <div class="insight-icon">
+                        🎯
+                    </div>
+
+
+                    <div class="insight-content">
+
+                        <span class="insight-label">
+                            Budget Utilization
+                        </span>
+
+
+                        <h3 class="insight-value">
+                            {{ insights.budget_utilization }}%
+                        </h3>
+
+
+                        <p class="insight-description">
+                            across
+                            {{ insights.active_budget_count }}
+                            active budget{{ insights.active_budget_count|pluralize }}.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             FINANCIAL HEALTH SCORE
+             ================================================= -->
+
+        <section class="health-section">
+
+
+            <div class="health-card">
+
+
+                <div class="health-gauge">
+
+
+                    <svg
+                        viewBox="0 0 160 160"
+                        aria-label="Financial Health Score"
+                        role="img"
+                    >
+
+                        <circle
+                            class="health-gauge-track"
+                            cx="80"
+                            cy="80"
+                            r="70"
+                        ></circle>
+
+
+                        <circle
+                            id="healthGaugeProgress"
+                            class="health-gauge-progress"
+                            cx="80"
+                            cy="80"
+                            r="70"
+                        ></circle>
+
+                    </svg>
+
+
+                    <div class="health-gauge-content">
+
+                        <h3 class="health-score">
+                            {{ financial_health.score }}
+                        </h3>
+
+
+                        <span class="health-score-label">
+                            out of 100
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+                <div class="health-details">
+
+
+                    <h2 class="health-title">
+                        ❤️ Financial Health
+                    </h2>
+
+
+                    <p class="health-subtitle">
+                        A transparent score based on your savings,
+                        budget usage, budget breaches, and expense trend.
+                    </p>
+
+
+                    <div class="health-status">
+                        ✦
+                        {{ financial_health.status }}
+                    </div>
+
+
+                    <div class="health-metrics">
+
+
+                        <div class="health-metric">
+
+                            <span class="health-metric-label">
+                                Savings
+                            </span>
+
+                            <p class="health-metric-value">
+                                {{ financial_health.savings_score }}/35
+                            </p>
+
+                        </div>
+
+
+                        <div class="health-metric">
+
+                            <span class="health-metric-label">
+                                Budget
+                            </span>
+
+                            <p class="health-metric-value">
+                                {{ financial_health.budget_score }}/25
+                            </p>
+
+                        </div>
+
+
+                        <div class="health-metric">
+
+                            <span class="health-metric-label">
+                                Budgets
+                            </span>
+
+                            <p class="health-metric-value">
+                                {{ financial_health.breach_score }}/20
+                            </p>
+
+                        </div>
+
+
+                        <div class="health-metric">
+
+                            <span class="health-metric-label">
+                                Trend
+                            </span>
+
+                            <p class="health-metric-value">
+                                {{ financial_health.trend_score }}/20
+                            </p>
+
+                        </div>
+
+
+                    </div>
+
+
+                    <p class="health-note">
+                        This score is an internal application metric
+                        and is not professional financial advice.
+                    </p>
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             BUDGET PROGRESS
+             ================================================= -->
+
+        <section class="budget-progress-section">
+
+
+            <div class="budget-progress-header">
+
+                <div>
+
+                    <h2>
+                        🎯 Budget Progress
+                    </h2>
+
+
+                    <p>
+                        Track your active budgets and spending limits
+                    </p>
+
+                </div>
+
+
+                <div class="budget-count-badge">
+                    {{ budget_progress|length }}
+                </div>
+
+            </div>
+
+
+            {% if budget_progress %}
+
+
+                <div class="budget-progress-grid">
+
+
+                    {% for budget in budget_progress %}
+
+
+                        <div class="budget-progress-card">
+
+
+                            <div class="budget-progress-top">
+
+
+                                <div class="budget-progress-name">
+
+                                    <h3>
+                                        {{ budget.category.name }}
+                                    </h3>
+
+                                    <span>
+                                        {{ budget.period|title }}
+                                        ·
+                                        {{ budget.start_date }}
+                                        to
+                                        {{ budget.end_date }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="budget-progress-percent">
+                                    {{ budget.percentage|floatformat:1 }}%
+                                </div>
+
+
+                            </div>
+
+
+                            <div
+                                class="budget-progress-bar"
+                                role="progressbar"
+                                aria-valuenow="{{ budget.percentage }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-label="{{ budget.category.name }} budget progress"
+                            >
+
+                                <div
+                                    class="budget-progress-fill {{ budget.status }}"
+                                    data-width="{{ budget.percentage }}"
+                                    style="width: 0%;"
+                                ></div>
+
+                            </div>
+
+
+                            <div class="budget-progress-bottom">
+
+
+                                <div class="budget-amount">
+
+                                    ₹{{ budget.spent|floatformat:2 }}
+
+                                    /
+
+                                    <strong>
+                                        ₹{{ budget.limit|floatformat:2 }}
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="budget-status {{ budget.status }}">
+
+                                    {% if budget.status == 'exceeded' %}
+
+                                        ⚠️ Budget exceeded
+
+                                    {% elif budget.status == 'warning' %}
+
+                                        ⚡ Near limit
+
+                                    {% else %}
+
+                                        ✓ Within limit
+
+                                    {% endif %}
+
+                                </div>
+
+
+                            </div>
+
+
+                            <div
+                                class="budget-amount"
+                                style="margin-top: 8px;"
+                            >
+
+                                {% if budget.remaining >= 0 %}
+
+                                    ₹{{ budget.remaining|floatformat:2 }}
+                                    remaining
+
+                                {% else %}
+
+                                    ₹{{ budget.remaining|floatformat:2|cut:"-" }}
+                                    over budget
+
+                                {% endif %}
+
+                            </div>
+
+
+                        </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+            {% else %}
+
+
+                <div class="no-budget-progress">
+
+                    🎯 No active budgets found.
+
+                    <br><br>
+
+                    Create a budget to start tracking your spending progress.
+
+                </div>
+
+
+            {% endif %}
+
+
+        </section>
+
 
         <!-- =================================================
              BUDGET ALERTS
@@ -1263,7 +3321,6 @@
 
 
                 <div class="budget-alert">
-
 
                     <span>
                         ⚠️
@@ -1287,7 +3344,6 @@
 
                     </div>
 
-
                 </div>
 
 
@@ -1297,7 +3353,6 @@
         {% endif %}
 
 
-
         <!-- =================================================
              ANALYTICS
              ================================================= -->
@@ -1305,10 +3360,7 @@
         <div class="analytics-grid">
 
 
-            <!-- EXPENSE CATEGORY -->
-
             <div class="chart-card">
-
 
                 <h2>
                     Expenses by Category
@@ -1316,7 +3368,7 @@
 
 
                 <p>
-                    Distribution of your current expenses
+                    Distribution of expenses for the selected period
                 </p>
 
 
@@ -1328,15 +3380,10 @@
 
                 </div>
 
-
             </div>
 
 
-
-            <!-- INCOME VS EXPENSES -->
-
             <div class="chart-card">
-
 
                 <h2>
                     Income vs Expenses
@@ -1344,7 +3391,7 @@
 
 
                 <p>
-                    Compare your total income and spending
+                    Compare income and spending for the selected period
                 </p>
 
 
@@ -1356,12 +3403,10 @@
 
                 </div>
 
-
             </div>
 
 
         </div>
-
 
 
         <!-- =================================================
@@ -1372,7 +3417,6 @@
 
 
             <div class="section-header">
-
 
                 <h2>
                     Recent Transactions
@@ -1386,9 +3430,7 @@
                     View All →
                 </a>
 
-
             </div>
-
 
 
             {% if recent_transactions %}
@@ -1423,7 +3465,6 @@
 
                                 <div class="transaction-name">
 
-
                                     {% if transaction.description %}
 
                                         {{ transaction.description }}
@@ -1433,7 +3474,6 @@
                                         {{ transaction.category.name }}
 
                                     {% endif %}
-
 
                                 </div>
 
@@ -1451,9 +3491,7 @@
 
                             </div>
 
-
                         </div>
-
 
 
                         <div
@@ -1468,7 +3506,6 @@
                             "
                         >
 
-
                             {% if transaction.type == 'income' %}
 
                                 + ₹{{ transaction.amount|floatformat:2 }}
@@ -1478,7 +3515,6 @@
                                 - ₹{{ transaction.amount|floatformat:2 }}
 
                             {% endif %}
-
 
                         </div>
 
@@ -1493,9 +3529,7 @@
 
 
                 <div class="no-transactions">
-
                     No transactions available yet.
-
                 </div>
 
 
@@ -1507,16 +3541,329 @@
 
     </main>
 
-
 </div>
 
 
-
 <!-- =========================================================
-     CHARTS
+     DASHBOARD JAVASCRIPT
      ========================================================= -->
 
 <script>
+
+
+    /* ========================================================
+       GLOBAL THEME
+       ======================================================== */
+
+    const THEME_STORAGE_KEY =
+        'expenseTrackerTheme';
+
+
+    function applyDashboardTheme(theme) {
+
+        const root =
+            document.documentElement;
+
+        const icon =
+            document.getElementById('themeIcon');
+
+        const text =
+            document.getElementById('themeText');
+
+        const toggle =
+            document.getElementById('themeToggle');
+
+
+        root.setAttribute(
+            'data-theme',
+            theme
+        );
+
+
+        const isDark =
+            theme === 'dark';
+
+
+        if (icon) {
+
+            icon.textContent =
+                isDark ? '☀️' : '🌙';
+
+        }
+
+
+        if (text) {
+
+            text.textContent =
+                isDark
+                    ? 'Light Mode'
+                    : 'Dark Mode';
+
+        }
+
+
+        if (toggle) {
+
+            toggle.setAttribute(
+                'aria-pressed',
+                isDark ? 'true' : 'false'
+            );
+
+            toggle.setAttribute(
+                'aria-label',
+                isDark
+                    ? 'Switch to light mode'
+                    : 'Switch to dark mode'
+            );
+
+        }
+
+
+        updateChartTheme();
+
+    }
+
+
+    function toggleDashboardTheme() {
+
+        const current =
+            document.documentElement.getAttribute(
+                'data-theme'
+            ) || 'light';
+
+
+        const next =
+            current === 'dark'
+                ? 'light'
+                : 'dark';
+
+
+        localStorage.setItem(
+            THEME_STORAGE_KEY,
+            next
+        );
+
+
+        applyDashboardTheme(next);
+
+    }
+
+
+    function initializeDashboardTheme() {
+
+        const savedTheme =
+            localStorage.getItem(
+                THEME_STORAGE_KEY
+            );
+
+
+        const prefersDark =
+            window.matchMedia &&
+            window.matchMedia(
+                '(prefers-color-scheme: dark)'
+            ).matches;
+
+
+        const theme =
+            savedTheme === 'dark'
+                ? 'dark'
+                : savedTheme === 'light'
+                    ? 'light'
+                    : prefersDark
+                        ? 'dark'
+                        : 'light';
+
+
+        applyDashboardTheme(theme);
+
+    }
+
+
+    document
+        .getElementById('themeToggle')
+        .addEventListener(
+            'click',
+            toggleDashboardTheme
+        );
+
+
+    /* ========================================================
+       BUDGET PROGRESS ANIMATION
+       ======================================================== */
+
+    function animateBudgetProgress() {
+
+        const progressBars =
+            document.querySelectorAll(
+                '.budget-progress-fill'
+            );
+
+
+        progressBars.forEach(
+            function (bar, index) {
+
+                const width =
+                    bar.getAttribute(
+                        'data-width'
+                    );
+
+
+                setTimeout(
+                    function () {
+
+                        bar.style.width =
+                            width + '%';
+
+                    },
+                    100 + (index * 80)
+                );
+
+            }
+        );
+
+    }
+
+
+    animateBudgetProgress();
+
+
+    /* ========================================================
+       FINANCIAL HEALTH GAUGE
+       ======================================================== */
+
+    function animateHealthGauge() {
+
+        const gauge =
+            document.getElementById(
+                'healthGaugeProgress'
+            );
+
+
+        if (!gauge) {
+            return;
+        }
+
+
+        const score =
+            Number(
+                '{{ financial_health.score|default:0 }}'
+            );
+
+
+        const radius = 70;
+
+        const circumference =
+            2 * Math.PI * radius;
+
+
+        const safeScore =
+            Math.max(
+                0,
+                Math.min(score, 100)
+            );
+
+
+        const offset =
+            circumference -
+            (safeScore / 100) *
+            circumference;
+
+
+        gauge.style.strokeDasharray =
+            circumference;
+
+
+        gauge.style.strokeDashoffset =
+            circumference;
+
+
+        setTimeout(
+            function () {
+
+                gauge.style.strokeDashoffset =
+                    offset;
+
+            },
+            150
+        );
+
+    }
+
+
+    animateHealthGauge();
+
+
+    /* ========================================================
+       DASHBOARD TIME FILTER
+       ======================================================== */
+
+    function handlePeriodChange(period) {
+
+        const form =
+            document.getElementById(
+                'dashboardFilterForm'
+            );
+
+
+        const customFields =
+            document.getElementById(
+                'customDateFields'
+            );
+
+
+        if (period === 'custom') {
+
+            customFields.style.display =
+                'flex';
+
+            return;
+
+        }
+
+
+        customFields.style.display =
+            'none';
+
+
+        form.submit();
+
+    }
+
+
+    function initializeDashboardFilter() {
+
+        const period =
+            document.getElementById(
+                'period'
+            );
+
+
+        const customFields =
+            document.getElementById(
+                'customDateFields'
+            );
+
+
+        if (!period || !customFields) {
+
+            return;
+
+        }
+
+
+        if (period.value === 'custom') {
+
+            customFields.style.display =
+                'flex';
+
+        } else {
+
+            customFields.style.display =
+                'none';
+
+        }
+
+    }
 
 
     /* ========================================================
@@ -1529,7 +3876,9 @@
 
             "{{ item.category__name|escapejs }}"
 
-            {% if not forloop.last %},{% endif %}
+            {% if not forloop.last %}
+                ,
+            {% endif %}
 
         {% endfor %}
 
@@ -1542,19 +3891,97 @@
 
             {{ item.total }}
 
-            {% if not forloop.last %},{% endif %}
+            {% if not forloop.last %}
+                ,
+            {% endif %}
 
         {% endfor %}
 
     ];
 
 
+    /* ========================================================
+       CHART INSTANCES
+       ======================================================== */
+
+    let expenseCategoryChart = null;
+
+    let incomeExpenseChart = null;
+
+
+    /* ========================================================
+       CHART THEME
+       ======================================================== */
+
+    function getChartTextColor() {
+
+        return document.documentElement
+            .getAttribute('data-theme') === 'dark'
+
+            ? '#cbd5e1'
+
+            : '#374151';
+
+    }
+
+
+    function getChartGridColor() {
+
+        return document.documentElement
+            .getAttribute('data-theme') === 'dark'
+
+            ? 'rgba(148, 163, 184, 0.14)'
+
+            : 'rgba(148, 163, 184, 0.20)';
+
+    }
+
+
+    function updateChartTheme() {
+
+        const textColor =
+            getChartTextColor();
+
+        const gridColor =
+            getChartGridColor();
+
+
+        if (expenseCategoryChart) {
+
+            expenseCategoryChart.options.plugins.legend.labels.color =
+                textColor;
+
+            expenseCategoryChart.update();
+
+        }
+
+
+        if (incomeExpenseChart) {
+
+            incomeExpenseChart.options.scales.x.ticks.color =
+                textColor;
+
+            incomeExpenseChart.options.scales.y.ticks.color =
+                textColor;
+
+            incomeExpenseChart.options.scales.y.grid.color =
+                gridColor;
+
+            incomeExpenseChart.options.scales.x.grid.color =
+                gridColor;
+
+            incomeExpenseChart.update();
+
+        }
+
+    }
+
 
     /* ========================================================
        EXPENSE CATEGORY CHART
        ======================================================== */
 
-    new Chart(
+    expenseCategoryChart = new Chart(
 
         document.getElementById(
             'expenseCategoryChart'
@@ -1605,6 +4032,8 @@
 
                             usePointStyle: true,
 
+                            color:
+                                getChartTextColor(),
 
                             font: {
 
@@ -1625,12 +4054,11 @@
     );
 
 
-
     /* ========================================================
        INCOME VS EXPENSE CHART
        ======================================================== */
 
-    new Chart(
+    incomeExpenseChart = new Chart(
 
         document.getElementById(
             'incomeExpenseChart'
@@ -1691,6 +4119,25 @@
 
                 scales: {
 
+                    x: {
+
+                        ticks: {
+
+                            color:
+                                getChartTextColor()
+
+                        },
+
+                        grid: {
+
+                            color:
+                                getChartGridColor()
+
+                        }
+
+                    },
+
+
                     y: {
 
                         beginAtZero: true,
@@ -1698,11 +4145,24 @@
 
                         ticks: {
 
-                            callback: function(value) {
+                            color:
+                                getChartTextColor(),
 
-                                return '₹' + value;
 
-                            }
+                            callback:
+                                function(value) {
+
+                                    return '₹' + value;
+
+                                }
+
+                        },
+
+
+                        grid: {
+
+                            color:
+                                getChartGridColor()
 
                         }
 
@@ -1717,6 +4177,14 @@
     );
 
 
+    /* ========================================================
+       INITIALIZE
+       ======================================================== */
+
+    initializeDashboardTheme();
+
+    initializeDashboardFilter();
+
 
     /* ========================================================
        CLOSE TOAST
@@ -1724,7 +4192,8 @@
 
     function closeToast(button) {
 
-        const toast = button.closest('.toast');
+        const toast =
+            button.closest('.toast');
 
 
         if (!toast) {
@@ -1737,14 +4206,16 @@
         toast.classList.add('hide');
 
 
-        setTimeout(function() {
+        setTimeout(
+            function() {
 
-            toast.remove();
+                toast.remove();
 
-        }, 300);
+            },
+            300
+        );
 
     }
-
 
 
     /* ========================================================
@@ -1753,26 +4224,32 @@
 
     document
         .querySelectorAll('.toast')
-        .forEach(function(toast) {
+        .forEach(
+            function(toast) {
+
+                setTimeout(
+                    function() {
+
+                        toast.classList.add(
+                            'hide'
+                        );
 
 
-            setTimeout(function() {
+                        setTimeout(
+                            function() {
 
+                                toast.remove();
 
-                toast.classList.add('hide');
+                            },
+                            300
+                        );
 
+                    },
+                    5000
+                );
 
-                setTimeout(function() {
-
-                    toast.remove();
-
-                }, 300);
-
-
-            }, 5000);
-
-
-        });
+            }
+        );
 
 
 </script>

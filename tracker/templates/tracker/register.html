@@ -31,7 +31,17 @@
         href="{% static 'tracker/favicon.png' %}?v=3"
     >
 
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
     <style>
+
+        /* =====================================================
+           REGISTER PAGE
+           ===================================================== */
 
         body {
             min-height: 100vh;
@@ -52,6 +62,10 @@
         }
 
 
+        /* =====================================================
+           MAIN REGISTER CARD
+           ===================================================== */
+
         .register-wrapper {
             width: 100%;
 
@@ -62,7 +76,7 @@
             grid-template-columns:
                 0.9fr 1.1fr;
 
-            background: white;
+            background: #ffffff;
 
             border-radius: 24px;
 
@@ -70,8 +84,16 @@
 
             box-shadow:
                 var(--shadow-lg);
+
+            transition:
+                background-color 0.25s ease,
+                box-shadow 0.25s ease;
         }
 
+
+        /* =====================================================
+           LEFT BRAND PANEL
+           ===================================================== */
 
         .register-brand {
             padding: 55px;
@@ -170,8 +192,20 @@
         }
 
 
+        /* =====================================================
+           RIGHT REGISTER FORM
+           ===================================================== */
+
         .register-form {
             padding: 45px 50px;
+
+            background: #ffffff;
+
+            color: #172033;
+
+            transition:
+                background-color 0.25s ease,
+                color 0.25s ease;
         }
 
 
@@ -179,6 +213,11 @@
             font-size: 28px;
 
             margin-bottom: 7px;
+
+            color: #172033;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -188,8 +227,15 @@
             font-size: 14px;
 
             margin-bottom: 25px;
+
+            transition:
+                color 0.25s ease;
         }
 
+
+        /* =====================================================
+           MESSAGE
+           ===================================================== */
 
         .message {
             padding: 12px 14px;
@@ -207,6 +253,10 @@
             font-size: 13px;
         }
 
+
+        /* =====================================================
+           FORM ERRORS
+           ===================================================== */
 
         .field-errors {
             margin-top: 6px;
@@ -246,6 +296,11 @@
             font-size: 13px;
 
             font-weight: 600;
+
+            color: #334155;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -263,7 +318,23 @@
 
             outline: none;
 
-            transition: var(--transition);
+            background: #ffffff;
+
+            color: #172033;
+
+            transition:
+                border-color 0.2s ease,
+                background-color 0.25s ease,
+                color 0.25s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        .register-form input::placeholder {
+            color: #94a3b8;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -275,6 +346,10 @@
                 rgba(99, 102, 241, 0.12);
         }
 
+
+        /* =====================================================
+           REGISTER BUTTON
+           ===================================================== */
 
         .register-btn {
             width: 100%;
@@ -308,6 +383,10 @@
         }
 
 
+        /* =====================================================
+           LOGIN LINK
+           ===================================================== */
+
         .login-text {
             margin-top: 22px;
 
@@ -316,6 +395,9 @@
             color: var(--text-light);
 
             font-size: 13px;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -330,6 +412,97 @@
             text-decoration: underline;
         }
 
+
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] .register-wrapper {
+            background: #151b2d !important;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+
+        html[data-theme="dark"] .register-form {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                ) !important;
+
+            color: #f8fafc !important;
+
+            border-left:
+                1px solid #2b354d;
+        }
+
+
+        html[data-theme="dark"] .register-form h2 {
+            color: #f8fafc !important;
+        }
+
+
+        html[data-theme="dark"] .subtitle {
+            color: #a7b0c2 !important;
+        }
+
+
+        html[data-theme="dark"] .register-form label {
+            color: #cbd5e1 !important;
+        }
+
+
+        html[data-theme="dark"] .register-form input {
+            background: #0f1728 !important;
+
+            color: #f8fafc !important;
+
+            border:
+                1px solid #34405a !important;
+        }
+
+
+        html[data-theme="dark"] .register-form input::placeholder {
+            color: #778198 !important;
+        }
+
+
+        html[data-theme="dark"] .register-form input:focus {
+            border-color:
+                #718cf5 !important;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(113, 140, 245, 0.16) !important;
+        }
+
+
+        html[data-theme="dark"] .help-text {
+            color: #8792a8 !important;
+        }
+
+
+        html[data-theme="dark"] .login-text {
+            color: #9da7ba !important;
+        }
+
+
+        html[data-theme="dark"] .login-text a {
+            color: #8ea8ff !important;
+        }
+
+
+        html[data-theme="dark"] .field-errors {
+            color: #ff8d8d !important;
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
 
         @media (max-width: 800px) {
 
@@ -347,6 +520,11 @@
                 padding: 35px 25px;
             }
 
+
+            html[data-theme="dark"] .register-form {
+                border-left: none;
+            }
+
         }
 
     </style>
@@ -354,7 +532,7 @@
 </head>
 
 
-<body>
+<body class="auth-page">
 
 
 <div class="register-wrapper">
@@ -444,7 +622,7 @@
 
     <!-- REGISTRATION FORM -->
 
-    <div class="register-form">
+    <div class="register-form auth-form-panel">
 
 
         <h2>
@@ -621,6 +799,9 @@
 
 </div>
 
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 </body>
 

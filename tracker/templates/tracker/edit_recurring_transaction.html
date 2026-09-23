@@ -1,0 +1,886 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Edit Recurring Transaction - Expense Tracker</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+        body {
+            background: #f5f7fb;
+        }
+
+        .page-layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #111827;
+            color: white;
+            padding: 25px 18px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            z-index: 100;
+        }
+
+        .brand {
+            padding: 10px 12px 30px;
+        }
+
+        .brand h2 {
+            font-size: 22px;
+            margin: 0 0 4px;
+        }
+
+        .brand p {
+            font-size: 12px;
+            color: #9ca3af;
+            margin: 0;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-title {
+            padding: 0 12px;
+            margin-bottom: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: #d1d5db;
+            font-size: 14px;
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background: #1f2937;
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .nav-link.active {
+            background: #6366f1;
+            color: white;
+        }
+
+        .logout-link {
+            color: #fca5a5;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 30px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 18px;
+            color: #6366f1;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #4f46e5;
+        }
+
+        .form-layout {
+            max-width: 850px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .form-header {
+            padding: 28px;
+            background: linear-gradient(
+                135deg,
+                #6366f1,
+                #4f46e5
+            );
+            color: white;
+        }
+
+        .form-header h1 {
+            margin: 0 0 7px;
+            font-size: 24px;
+        }
+
+        .form-header p {
+            margin: 0;
+            color: #e0e7ff;
+            font-size: 13px;
+        }
+
+        .form-body {
+            padding: 28px;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .field-full {
+            grid-column: 1 / -1;
+        }
+
+        .field-group label {
+            color: #374151;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field-group input,
+        .field-group select,
+        .field-group textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 13px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            color: #111827;
+            font-size: 13px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.2s ease;
+        }
+
+        .field-group textarea {
+            min-height: 95px;
+            resize: vertical;
+        }
+
+        .field-group input:focus,
+        .field-group select:focus,
+        .field-group textarea:focus {
+            border-color: #6366f1;
+            background: white;
+            box-shadow:
+                0 0 0 3px rgba(99, 102, 241, 0.10);
+        }
+
+        .help-text {
+            color: #9ca3af;
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .error-list {
+            margin: 5px 0 0;
+            padding: 0;
+            list-style: none;
+            color: #dc2626;
+            font-size: 11px;
+        }
+
+        .form-errors {
+            margin-bottom: 20px;
+            padding: 13px 15px;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-size: 12px;
+        }
+
+        .info-box {
+            margin-top: 22px;
+            padding: 15px 16px;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 11px;
+            color: #4338ca;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 0 17px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.2s ease;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            border-color: #c7d2fe;
+            color: #4f46e5;
+        }
+
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4f46e5;
+            transform: translateY(-1px);
+        }
+
+
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                #0b1020;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .sidebar {
+            background:
+                linear-gradient(
+                    180deg,
+                    #101626 0%,
+                    #0c1220 100%
+                );
+        }
+
+
+        html[data-theme="dark"] .welcome p {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .user-badge {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #e5e7eb;
+
+            box-shadow:
+                0 6px 18px rgba(0, 0, 0, 0.18);
+        }
+
+
+        html[data-theme="dark"] .back-link {
+            color: #8ea8ff;
+        }
+
+
+        html[data-theme="dark"] .back-link:hover {
+            color: #b1c2ff;
+        }
+
+
+        html[data-theme="dark"] .form-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+
+            box-shadow:
+                0 14px 40px rgba(0, 0, 0, 0.25);
+        }
+
+
+        html[data-theme="dark"] .form-header {
+            background:
+                linear-gradient(
+                    135deg,
+                    #5a5ff0,
+                    #5147d8
+                );
+        }
+
+
+        html[data-theme="dark"] .form-body {
+            background: transparent;
+        }
+
+
+        html[data-theme="dark"] .field-group label {
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .field-group input,
+        html[data-theme="dark"] .field-group select,
+        html[data-theme="dark"] .field-group textarea {
+            background: #0f1728;
+
+            border-color: #34405a;
+
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .field-group input::placeholder,
+        html[data-theme="dark"] .field-group textarea::placeholder {
+            color: #778198;
+        }
+
+
+        html[data-theme="dark"] .field-group input:focus,
+        html[data-theme="dark"] .field-group select:focus,
+        html[data-theme="dark"] .field-group textarea:focus {
+            background: #121a2d;
+
+            border-color: #718cf5;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(113, 140, 245, 0.16);
+        }
+
+
+        html[data-theme="dark"] .help-text {
+            color: #8792a8;
+        }
+
+
+        html[data-theme="dark"] .error-list {
+            color: #ff8d8d;
+        }
+
+
+        html[data-theme="dark"] .form-errors {
+            background:
+                rgba(239, 68, 68, 0.10);
+
+            border-color:
+                rgba(248, 113, 113, 0.25);
+
+            color: #fca5a5;
+        }
+
+
+        html[data-theme="dark"] .info-box {
+            background:
+                rgba(99, 102, 241, 0.12);
+
+            border-color:
+                rgba(129, 140, 248, 0.25);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .form-actions {
+            border-top-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .btn-secondary {
+            background: #151b2d;
+
+            border-color: #34405a;
+
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .btn-secondary:hover {
+            background: #1b2338;
+
+            border-color: #6366f1;
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .btn-primary:hover {
+            background: #4f46e5;
+        }
+
+
+        @media (max-width: 768px) {
+
+            html[data-theme="dark"] .sidebar {
+                border-bottom: 1px solid #2b354d;
+            }
+
+        }
+
+        @media (max-width: 768px) {
+            .page-layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .field-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field-full {
+                grid-column: auto;
+            }
+
+            .form-body,
+            .form-header {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .main-content {
+                padding: 15px;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-layout">
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h2>Expense Tracker</h2>
+            <p>Personal Finance Manager</p>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Main</div>
+
+            <a href="{% url 'dashboard' %}" class="nav-link">
+                📊 Dashboard
+            </a>
+
+            <a href="{% url 'transaction_list' %}" class="nav-link">
+                💳 Transactions
+            </a>
+
+            <a href="{% url 'add_transaction' %}" class="nav-link">
+                ➕ Add Transaction
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Planning</div>
+
+            <a href="{% url 'budget_list' %}" class="nav-link">
+                🎯 Budgets
+            </a>
+
+            <a href="{% url 'add_budget' %}" class="nav-link">
+                ➕ Add Budget
+            </a>
+
+            <a
+                href="{% url 'recurring_transaction_list' %}"
+                class="nav-link active"
+            >
+                🔄 Recurring Transactions
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Reports</div>
+
+            <a href="{% url 'report_view' %}" class="nav-link">
+                📈 Reports & Analytics
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Account</div>
+
+            <a href="{% url 'profile' %}" class="nav-link">
+                👤 My Profile
+            </a>
+
+            <a href="{% url 'logout' %}" class="nav-link logout-link">
+                🚪 Logout
+            </a>
+        </div>
+
+    </aside>
+
+
+    <main class="main-content">
+
+        <div class="form-layout">
+
+            <a
+                href="{% url 'recurring_transaction_list' %}"
+                class="back-link"
+            >
+                ← Back to Recurring Transactions
+            </a>
+
+
+            <div class="form-card">
+
+                <div class="form-header">
+
+                    <h1>
+                        Edit Recurring Transaction
+                    </h1>
+
+                    <p>
+                        Update the schedule, amount, category, frequency, or dates of this recurring transaction.
+                    </p>
+
+                </div>
+
+
+                <div class="form-body">
+
+                    {% if form.non_field_errors %}
+
+                        <div class="form-errors">
+
+                            {{ form.non_field_errors }}
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <form
+                        method="POST"
+                        novalidate
+                    >
+
+                        {% csrf_token %}
+
+
+                        <div class="field-grid">
+
+                            <div class="field-group">
+
+                                <label for="{{ form.category.id_for_label }}">
+                                    Category
+                                </label>
+
+                                {{ form.category }}
+
+                                {% if form.category.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.category.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.amount.id_for_label }}">
+                                    Amount
+                                </label>
+
+                                {{ form.amount }}
+
+                                {% if form.amount.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.amount.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.type.id_for_label }}">
+                                    Transaction Type
+                                </label>
+
+                                {{ form.type }}
+
+                                {% if form.type.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.type.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.payment_method.id_for_label }}">
+                                    Payment Method
+                                </label>
+
+                                {{ form.payment_method }}
+
+                                {% if form.payment_method.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.payment_method.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group field-full">
+
+                                <label for="{{ form.description.id_for_label }}">
+                                    Description
+                                </label>
+
+                                {{ form.description }}
+
+                                {% if form.description.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.description.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.frequency.id_for_label }}">
+                                    Frequency
+                                </label>
+
+                                {{ form.frequency }}
+
+                                {% if form.frequency.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.frequency.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.day_of_month.id_for_label }}">
+                                    Day
+                                </label>
+
+                                {{ form.day_of_month }}
+
+                                {% if form.day_of_month.help_text %}
+                                    <div class="help-text">
+                                        {{ form.day_of_month.help_text }}
+                                    </div>
+                                {% endif %}
+
+                                {% if form.day_of_month.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.day_of_month.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.start_date.id_for_label }}">
+                                    Start Date
+                                </label>
+
+                                {{ form.start_date }}
+
+                                {% if form.start_date.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.start_date.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="field-group">
+
+                                <label for="{{ form.end_date.id_for_label }}">
+                                    End Date
+                                    <span style="font-weight: 400; color: #9ca3af;">
+                                        (Optional)
+                                    </span>
+                                </label>
+
+                                {{ form.end_date }}
+
+                                {% if form.end_date.errors %}
+                                    <ul class="error-list">
+                                        {% for error in form.end_date.errors %}
+                                            <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="info-box">
+
+                            <strong>💡 How scheduling works</strong>
+
+                            The system recalculates the <b>next scheduled date</b>
+                            automatically after your changes are saved.
+
+                        </div>
+
+
+                        <div class="form-actions">
+
+                            <a
+                                href="{% url 'recurring_transaction_list' %}"
+                                class="btn btn-secondary"
+                            >
+                                Cancel
+                            </a>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                💾 Save Changes
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
+
+</body>
+</html>

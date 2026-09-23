@@ -81,4 +81,34 @@ urlpatterns = [
         views.admin_dashboard,
         name='admin_dashboard'
     ),
+
+    path(
+        'recurring-transactions/',
+        views.recurring_transaction_list,
+        name='recurring_transaction_list'
+    ),
+
+    path(
+        'recurring-transactions/add/',
+        views.add_recurring_transaction,
+        name='add_recurring_transaction'
+    ),
+
+    path(
+        'recurring-transactions/<int:recurring_id>/edit/',
+        views.edit_recurring_transaction,
+        name='edit_recurring_transaction'
+    ),
+
+    path(
+        'recurring-transactions/<int:recurring_id>/toggle/',
+        views.toggle_recurring_transaction,
+        name='toggle_recurring_transaction'
+    ),
+
+    path(
+        'recurring-transactions/<int:recurring_id>/delete/',
+        views.delete_recurring_transaction,
+        name='delete_recurring_transaction'
+    ),
 ]

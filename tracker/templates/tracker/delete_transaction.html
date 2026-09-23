@@ -14,11 +14,20 @@
 
     <title>Delete Transaction - Expense Tracker</title>
 
+
     <!-- Global Styles -->
     <link
         rel="stylesheet"
         href="{% static 'tracker/css/style.css' %}"
     >
+
+
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
 
     <!-- Expense Tracker Favicon -->
     <link
@@ -32,7 +41,12 @@
         href="{% static 'tracker/favicon.png' %}?v=3"
     >
 
+
     <style>
+
+        /* =====================================================
+           PAGE
+           ===================================================== */
 
         body {
             min-height: 100vh;
@@ -42,11 +56,16 @@
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
             padding: 25px;
         }
 
+
+        /* =====================================================
+           DELETE CARD
+           ===================================================== */
 
         .delete-card {
             width: min(520px, 100%);
@@ -62,13 +81,21 @@
             box-shadow: var(--shadow-lg);
 
             text-align: center;
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
         }
 
 
-        /* ================= WARNING ICON ================= */
+        /* =====================================================
+           WARNING ICON
+           ===================================================== */
 
         .warning-icon {
             width: 64px;
+
             height: 64px;
 
             margin: 0 auto 20px;
@@ -76,6 +103,7 @@
             display: flex;
 
             align-items: center;
+
             justify-content: center;
 
             border-radius: 18px;
@@ -85,10 +113,16 @@
             color: #dc2626;
 
             font-size: 28px;
+
+            transition:
+                background-color 0.25s ease,
+                color 0.25s ease;
         }
 
 
-        /* ================= HEADING ================= */
+        /* =====================================================
+           HEADING
+           ===================================================== */
 
         .delete-card h1 {
             font-size: 26px;
@@ -96,6 +130,9 @@
             margin-bottom: 8px;
 
             color: #1f2937;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -107,10 +144,15 @@
             line-height: 1.6;
 
             margin-bottom: 25px;
+
+            transition:
+                color 0.25s ease;
         }
 
 
-        /* ================= TRANSACTION DETAILS ================= */
+        /* =====================================================
+           TRANSACTION DETAILS
+           ===================================================== */
 
         .transaction-details {
             background: #f8fafc;
@@ -124,6 +166,10 @@
             margin-bottom: 25px;
 
             text-align: left;
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease;
         }
 
 
@@ -139,6 +185,9 @@
             border-bottom: 1px solid #e5e7eb;
 
             font-size: 13px;
+
+            transition:
+                border-color 0.25s ease;
         }
 
 
@@ -158,6 +207,9 @@
             color: #6b7280;
 
             font-weight: 500;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -167,6 +219,9 @@
             font-weight: 600;
 
             text-align: right;
+
+            transition:
+                color 0.25s ease;
         }
 
 
@@ -177,7 +232,9 @@
         }
 
 
-        /* ================= WARNING MESSAGE ================= */
+        /* =====================================================
+           WARNING MESSAGE
+           ===================================================== */
 
         .warning-message {
             padding: 13px 15px;
@@ -195,10 +252,17 @@
             font-size: 12px;
 
             line-height: 1.5;
+
+            transition:
+                background-color 0.25s ease,
+                border-color 0.25s ease,
+                color 0.25s ease;
         }
 
 
-        /* ================= ACTIONS ================= */
+        /* =====================================================
+           ACTIONS
+           ===================================================== */
 
         .actions {
             display: flex;
@@ -216,6 +280,7 @@
             display: inline-flex;
 
             align-items: center;
+
             justify-content: center;
 
             padding: 12px 18px;
@@ -241,6 +306,8 @@
 
         .cancel-btn:hover {
             background: #f1f5f9;
+
+            transform: translateY(-1px);
         }
 
 
@@ -266,7 +333,112 @@
         }
 
 
-        /* ================= MOBILE ================= */
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top,
+                    rgba(99, 102, 241, 0.08),
+                    transparent 35%
+                ),
+                #0b1020;
+        }
+
+
+        html[data-theme="dark"] .delete-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+
+            box-shadow:
+                0 18px 45px
+                rgba(0, 0, 0, 0.30);
+        }
+
+
+        html[data-theme="dark"] .warning-icon {
+            background:
+                rgba(239, 68, 68, 0.13);
+
+            color: #f87171;
+        }
+
+
+        html[data-theme="dark"] .delete-card h1 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .subtitle {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .transaction-details {
+            background: #0f1728;
+
+            border-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .detail-row {
+            border-bottom-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .detail-label {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .detail-value {
+            color: #dbe4f0;
+        }
+
+
+        html[data-theme="dark"] .amount-value {
+            color: #f87171;
+        }
+
+
+        html[data-theme="dark"] .warning-message {
+            background:
+                rgba(245, 158, 11, 0.10);
+
+            border-color:
+                rgba(245, 158, 11, 0.24);
+
+            color: #fdba74;
+        }
+
+
+        html[data-theme="dark"] .cancel-btn {
+            background: #1b2338;
+
+            border-color: #34405a;
+
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .cancel-btn:hover {
+            background: #252e43;
+
+            border-color: #465673;
+        }
+
+
+        /* =====================================================
+           MOBILE
+           ===================================================== */
 
         @media (max-width: 550px) {
 
@@ -318,7 +490,6 @@
         This action cannot be undone.
 
     </p>
-
 
 
     <!-- ================= DETAILS ================= -->
@@ -381,7 +552,6 @@
     </div>
 
 
-
     <!-- ================= WARNING ================= -->
 
     <div class="warning-message">
@@ -390,7 +560,6 @@
         from your transaction history.
 
     </div>
-
 
 
     <!-- ================= ACTIONS ================= -->
@@ -426,6 +595,10 @@
 
 
 </div>
+
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 
 </body>

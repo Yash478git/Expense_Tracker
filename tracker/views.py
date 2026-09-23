@@ -3,8 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Sum
-from django.db import models
-from datetime import timedelta
+from django.db import models, transaction
+import calendar
+
+from datetime import date, timedelta
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
@@ -13,10 +15,17 @@ from .forms import (
     BudgetForm,
     CustomPasswordChangeForm,
     ProfileForm,
+    RecurringTransactionForm,
     RegistrationForm,
     TransactionForm,
 )
-from .models import Budget, Category, Transaction, Report
+from .models import (
+    Budget,
+    Category,
+    Transaction,
+    Report,
+    RecurringTransaction,
+)
 
 from django.http import HttpResponse
 
@@ -51,6 +60,163 @@ from openpyxl.styles import (
     Alignment,
 )
 from openpyxl.utils import get_column_letter
+
+
+# =========================================================
+# RECURRING TRANSACTION PROCESSOR
+# =========================================================
+
+def get_next_recurring_date(
+    current_date,
+    frequency,
+    day_of_month
+):
+    """
+    Calculate the next occurrence after current_date.
+
+    For monthly schedules, the requested day is capped to
+    the last valid day of the target month.
+
+    For yearly schedules, the month is preserved and the
+    year is advanced by one.
+    """
+
+    if frequency == 'yearly':
+        next_year = current_date.year + 1
+        target_month = current_date.month
+
+    else:
+        next_year = current_date.year
+        target_month = current_date.month + 1
+
+        if target_month > 12:
+            target_month = 1
+            next_year += 1
+
+    last_day = calendar.monthrange(
+        next_year,
+        target_month
+    )[1]
+
+    return date(
+        next_year,
+        target_month,
+        min(day_of_month, last_day)
+    )
+
+
+def process_due_recurring_transactions(user):
+    """
+    Materialize every due recurring transaction into a normal
+    Transaction record.
+
+    The function can safely be called repeatedly because
+    next_date is advanced after every generated transaction.
+    """
+
+    today = timezone.localdate()
+    created_count = 0
+
+    recurring_queryset = (
+        RecurringTransaction.objects
+        .filter(
+            user=user,
+            is_active=True,
+            next_date__lte=today
+        )
+        .order_by('next_date', 'id')
+    )
+
+    for recurring in recurring_queryset:
+
+        with transaction.atomic():
+
+            locked_recurring = (
+                RecurringTransaction.objects
+                .select_for_update()
+                .select_related('category')
+                .get(pk=recurring.pk)
+            )
+
+            # Another request may have already processed it.
+            if (
+                not locked_recurring.is_active
+                or locked_recurring.next_date > today
+            ):
+                continue
+
+            while (
+                locked_recurring.is_active
+                and locked_recurring.next_date <= today
+            ):
+
+                occurrence_date = (
+                    locked_recurring.next_date
+                )
+
+                # Do not create an occurrence beyond the
+                # configured end date.
+                if (
+                    locked_recurring.end_date
+                    and occurrence_date
+                    > locked_recurring.end_date
+                ):
+                    locked_recurring.is_active = False
+                    locked_recurring.save(
+                        update_fields=[
+                            'is_active',
+                            'updated_at',
+                        ]
+                    )
+                    break
+
+                Transaction.objects.create(
+                    user=locked_recurring.user,
+                    category=locked_recurring.category,
+                    amount=locked_recurring.amount,
+                    type=locked_recurring.type,
+                    date=occurrence_date,
+                    payment_method=(
+                        locked_recurring.payment_method
+                    ),
+                    description=(
+                        locked_recurring.description
+                    ),
+                )
+
+                created_count += 1
+
+                next_date = get_next_recurring_date(
+                    occurrence_date,
+                    locked_recurring.frequency,
+                    locked_recurring.day_of_month
+                )
+
+                locked_recurring.next_date = next_date
+
+                if (
+                    locked_recurring.end_date
+                    and next_date > locked_recurring.end_date
+                ):
+                    locked_recurring.is_active = False
+                    locked_recurring.save(
+                        update_fields=[
+                            'next_date',
+                            'is_active',
+                            'updated_at',
+                        ]
+                    )
+                    break
+
+                locked_recurring.save(
+                    update_fields=[
+                        'next_date',
+                        'updated_at',
+                    ]
+                )
+
+    return created_count
+
 
 def register(request):
     if request.method == 'POST':
@@ -152,7 +318,137 @@ def change_password(request):
     )
 @login_required
 def dashboard(request):
-    transactions = request.user.transactions.all()
+    # ---------------------------------------------------------
+    # PROCESS DUE RECURRING TRANSACTIONS
+    # ---------------------------------------------------------
+
+    created_recurring_count = (
+        process_due_recurring_transactions(
+            request.user
+        )
+    )
+
+    if created_recurring_count:
+        messages.success(
+            request,
+            (
+                f'{created_recurring_count} recurring '
+                'transaction'
+                f'{"s" if created_recurring_count != 1 else ""} '
+                'automatically added.'
+            )
+        )
+
+    # Refresh the queryset so newly created transactions
+    # are included in dashboard totals and charts.
+    all_transactions = request.user.transactions.all()
+
+    # ---------------------------------------------------------
+    # DASHBOARD TIME FILTER
+    # ---------------------------------------------------------
+
+    today = timezone.localdate()
+
+    selected_period = request.GET.get(
+        'period',
+        'this_month'
+    )
+
+    start_date = None
+    end_date = today
+
+    if selected_period == 'this_month':
+        start_date = today.replace(
+            day=1
+        )
+
+    elif selected_period == 'last_month':
+        if today.month == 1:
+            start_date = date(
+                today.year - 1,
+                12,
+                1
+            )
+        else:
+            start_date = date(
+                today.year,
+                today.month - 1,
+                1
+            )
+
+        end_date = (
+            start_date + timedelta(days=32)
+        ).replace(
+            day=1
+        ) - timedelta(days=1)
+
+    elif selected_period == 'this_year':
+        start_date = date(
+            today.year,
+            1,
+            1
+        )
+
+    elif selected_period == 'last_year':
+        start_date = date(
+            today.year - 1,
+            1,
+            1
+        )
+
+        end_date = date(
+            today.year - 1,
+            12,
+            31
+        )
+
+    elif selected_period == 'custom':
+        custom_from = request.GET.get(
+            'date_from',
+            ''
+        ).strip()
+
+        custom_to = request.GET.get(
+            'date_to',
+            ''
+        ).strip()
+
+        try:
+            start_date = date.fromisoformat(
+                custom_from
+            )
+
+            end_date = date.fromisoformat(
+                custom_to
+            )
+
+            if start_date > end_date:
+                start_date, end_date = (
+                    end_date,
+                    start_date
+                )
+
+        except (ValueError, TypeError):
+            start_date = today.replace(
+                day=1
+            )
+            end_date = today
+
+    else:
+        selected_period = 'this_month'
+        start_date = today.replace(
+            day=1
+        )
+
+    # Transactions used by the dashboard cards/charts.
+    transactions = all_transactions.filter(
+        date__gte=start_date,
+        date__lte=end_date
+    )
+
+    # ---------------------------------------------------------
+    # BASIC FINANCIAL SUMMARY
+    # ---------------------------------------------------------
 
     total_income = transactions.filter(
         type='income'
@@ -168,9 +464,20 @@ def dashboard(request):
 
     balance = total_income - total_expenses
 
+    # ---------------------------------------------------------
+    # RECENT TRANSACTIONS
+    # ---------------------------------------------------------
+
     recent_transactions = transactions.select_related(
         'category'
-    ).order_by('-date', '-created_at')[:5]
+    ).order_by(
+        '-date',
+        '-created_at'
+    )[:5]
+
+    # ---------------------------------------------------------
+    # EXPENSE BY CATEGORY
+    # ---------------------------------------------------------
 
     expense_by_category = transactions.filter(
         type='expense'
@@ -178,31 +485,365 @@ def dashboard(request):
         'category__name'
     ).annotate(
         total=Sum('amount')
-    ).order_by('-total')    
+    ).order_by(
+        '-total'
+    )
+
+    # ---------------------------------------------------------
+    # BUDGET ALERTS
+    # ---------------------------------------------------------
 
     budgets = Budget.objects.filter(
         user=request.user
-    ).select_related('category')
+    ).select_related(
+        'category'
+    )
 
     exceeded_budgets = []
 
     for budget in budgets:
-        spent = transactions.filter(
+        # Budget spending must use ALL transactions so that
+        # the dashboard filter does not hide budget activity.
+        spent = all_transactions.filter(
             category=budget.category,
             type='expense',
             date__gte=budget.start_date,
-            date__lte=budget.end_date,
+            date__lte=budget.end_date
         ).aggregate(
             total=Sum('amount')
         )['total'] or 0
 
         if spent >= budget.limit:
             exceeded_budgets.append({
-                'category': budget.category.name,
+                'category': budget.category,
                 'limit': budget.limit,
                 'spent': spent,
                 'remaining': budget.limit - spent,
+                'period': budget.period,
             })
+
+    # ---------------------------------------------------------
+    # BUDGET PROGRESS
+    # ---------------------------------------------------------
+
+    budget_progress = []
+
+    for budget in budgets:
+        # Only show budgets that are active today.
+        if not (
+            budget.start_date
+            <= today
+            <= budget.end_date
+        ):
+            continue
+
+        spent = all_transactions.filter(
+            category=budget.category,
+            type='expense',
+            date__gte=budget.start_date,
+            date__lte=budget.end_date
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+
+        if budget.limit > 0:
+            percentage = (
+                spent / budget.limit
+            ) * 100
+        else:
+            percentage = 0
+
+        # Keep the visual progress bar within 0–100%.
+        display_percentage = min(
+            round(percentage, 1),
+            100
+        )
+
+        remaining = budget.limit - spent
+
+        if percentage >= 100:
+            status = 'exceeded'
+        elif percentage >= 80:
+            status = 'warning'
+        else:
+            status = 'safe'
+
+        budget_progress.append({
+            'category': budget.category,
+            'limit': budget.limit,
+            'spent': spent,
+            'remaining': remaining,
+            'percentage': display_percentage,
+            'status': status,
+            'period': budget.period,
+            'start_date': budget.start_date,
+            'end_date': budget.end_date,
+        })
+
+    # ---------------------------------------------------------
+    # SMART INSIGHTS
+    # ---------------------------------------------------------
+
+    # 1. Savings Rate for the selected dashboard period.
+    if total_income > 0:
+        savings_rate = (
+            balance / total_income
+        ) * 100
+    else:
+        savings_rate = 0
+
+    savings_rate = round(
+        savings_rate,
+        1
+    )
+
+    # 2. Top Spending Category for the selected period.
+    top_spending_category = (
+        expense_by_category.first()
+    )
+
+    if top_spending_category:
+        top_category_name = (
+            top_spending_category['category__name']
+        )
+        top_category_amount = (
+            top_spending_category['total']
+        )
+    else:
+        top_category_name = 'No expenses yet'
+        top_category_amount = 0
+
+    # 3. Highest Expense in the selected period.
+    highest_expense = transactions.filter(
+        type='expense'
+    ).select_related(
+        'category'
+    ).order_by(
+        '-amount',
+        '-date'
+    ).first()
+
+    # 4. Highest Income in the selected period.
+    highest_income = transactions.filter(
+        type='income'
+    ).select_related(
+        'category'
+    ).order_by(
+        '-amount',
+        '-date'
+    ).first()
+
+    # ---------------------------------------------------------
+    # MONTH-OVER-MONTH EXPENSE COMPARISON
+    # ---------------------------------------------------------
+
+    current_month_start = date(
+        today.year,
+        today.month,
+        1
+    )
+
+    if today.month == 1:
+        previous_month_start = date(
+            today.year - 1,
+            12,
+            1
+        )
+    else:
+        previous_month_start = date(
+            today.year,
+            today.month - 1,
+            1
+        )
+
+    current_month_expenses = (
+        all_transactions.filter(
+            type='expense',
+            date__gte=current_month_start,
+            date__lte=today
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+    )
+
+    previous_month_expenses = (
+        all_transactions.filter(
+            type='expense',
+            date__gte=previous_month_start,
+            date__lt=current_month_start
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+    )
+
+    if previous_month_expenses > 0:
+        expense_change = (
+            (
+                current_month_expenses
+                - previous_month_expenses
+            )
+            / previous_month_expenses
+        ) * 100
+
+        expense_change = round(
+            expense_change,
+            1
+        )
+    else:
+        expense_change = 0
+
+    # ---------------------------------------------------------
+    # BUDGET UTILIZATION
+    # ---------------------------------------------------------
+
+    active_budgets = budgets.filter(
+        start_date__lte=today,
+        end_date__gte=today
+    )
+
+    total_budget_limit = 0
+    total_budget_used = 0
+    active_budget_count = 0
+
+    for budget in active_budgets:
+        spent = all_transactions.filter(
+            category=budget.category,
+            type='expense',
+            date__gte=budget.start_date,
+            date__lte=budget.end_date
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or 0
+
+        total_budget_limit += budget.limit
+        total_budget_used += min(
+            spent,
+            budget.limit
+        )
+        active_budget_count += 1
+
+    if total_budget_limit > 0:
+        budget_utilization = (
+            total_budget_used
+            / total_budget_limit
+        ) * 100
+
+        budget_utilization = round(
+            budget_utilization,
+            1
+        )
+    else:
+        budget_utilization = 0
+
+    # ---------------------------------------------------------
+    # SMART INSIGHTS OBJECT
+    # ---------------------------------------------------------
+
+    insights = {
+        'savings_rate': savings_rate,
+
+        'top_category_name': top_category_name,
+        'top_category_amount': top_category_amount,
+
+        'highest_expense': highest_expense,
+        'highest_income': highest_income,
+
+        'current_month_expenses': (
+            current_month_expenses
+        ),
+        'previous_month_expenses': (
+            previous_month_expenses
+        ),
+        'expense_change': expense_change,
+
+        'budget_utilization': budget_utilization,
+        'active_budget_count': active_budget_count,
+    }
+
+    # ---------------------------------------------------------
+    # FINANCIAL HEALTH SCORE
+    # ---------------------------------------------------------
+    #
+    # This is a transparent, rule-based application metric.
+    # It is not professional financial advice.
+
+    # Savings contribution: maximum 35 points.
+    if savings_rate >= 30:
+        savings_score = 35
+    elif savings_rate >= 20:
+        savings_score = 30
+    elif savings_rate >= 10:
+        savings_score = 20
+    elif savings_rate > 0:
+        savings_score = 10
+    else:
+        savings_score = 0
+
+    # Budget utilization contribution: maximum 25 points.
+    if budget_utilization <= 50:
+        budget_score = 25
+    elif budget_utilization <= 75:
+        budget_score = 20
+    elif budget_utilization <= 90:
+        budget_score = 12
+    elif budget_utilization <= 100:
+        budget_score = 5
+    else:
+        budget_score = 0
+
+    # Budget breach contribution: maximum 20 points.
+    exceeded_count = len(exceeded_budgets)
+
+    if exceeded_count == 0:
+        breach_score = 20
+    elif exceeded_count == 1:
+        breach_score = 8
+    elif exceeded_count == 2:
+        breach_score = 4
+    else:
+        breach_score = 0
+
+    # Expense trend contribution: maximum 20 points.
+    if expense_change <= -10:
+        trend_score = 20
+    elif expense_change <= 0:
+        trend_score = 15
+    elif expense_change <= 10:
+        trend_score = 10
+    elif expense_change <= 20:
+        trend_score = 5
+    else:
+        trend_score = 0
+
+    financial_health_score = (
+        savings_score
+        + budget_score
+        + breach_score
+        + trend_score
+    )
+
+    if financial_health_score >= 85:
+        financial_health_status = 'Excellent'
+    elif financial_health_score >= 70:
+        financial_health_status = 'Healthy'
+    elif financial_health_score >= 50:
+        financial_health_status = 'Moderate'
+    else:
+        financial_health_status = 'Needs Attention'
+
+    financial_health = {
+        'score': financial_health_score,
+        'status': financial_health_status,
+        'savings_score': savings_score,
+        'budget_score': budget_score,
+        'breach_score': breach_score,
+        'trend_score': trend_score,
+    }
+
+
+    # ---------------------------------------------------------
+    # DASHBOARD
+    # ---------------------------------------------------------
 
     return render(
         request,
@@ -214,8 +855,17 @@ def dashboard(request):
             'exceeded_budgets': exceeded_budgets,
             'expense_by_category': expense_by_category,
             'recent_transactions': recent_transactions,
+            'insights': insights,
+            'financial_health': financial_health,
+            'budget_progress': budget_progress,
+
+            # Time-filter values for the dashboard UI.
+            'selected_period': selected_period,
+            'filter_start_date': start_date,
+            'filter_end_date': end_date,
         }
     )
+
 
 @login_required
 def admin_dashboard(request):
@@ -248,6 +898,266 @@ def admin_dashboard(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+
+# =========================================================
+# RECURRING TRANSACTIONS
+# =========================================================
+
+def calculate_next_recurring_date(
+    start_date,
+    frequency,
+    day_of_month
+):
+    """
+    Calculate the first scheduled occurrence for a recurring
+    transaction.
+    """
+
+    if frequency == 'yearly':
+        target_year = start_date.year
+
+        if day_of_month <= start_date.day:
+            target_year += 1
+
+        last_day = calendar.monthrange(
+            target_year,
+            start_date.month
+        )[1]
+
+        return date(
+            target_year,
+            start_date.month,
+            min(day_of_month, last_day)
+        )
+
+    # Monthly frequency.
+    target_year = start_date.year
+    target_month = start_date.month
+
+    if day_of_month <= start_date.day:
+        if target_month == 12:
+            target_year += 1
+            target_month = 1
+        else:
+            target_month += 1
+
+    last_day = calendar.monthrange(
+        target_year,
+        target_month
+    )[1]
+
+    return date(
+        target_year,
+        target_month,
+        min(day_of_month, last_day)
+    )
+
+
+@login_required
+def recurring_transaction_list(request):
+    process_due_recurring_transactions(
+        request.user
+    )
+
+    recurring_transactions = (
+        request.user.recurring_transactions
+        .select_related('category')
+        .order_by(
+            '-is_active',
+            'next_date',
+            '-created_at'
+        )
+    )
+
+    active_count = recurring_transactions.filter(
+        is_active=True
+    ).count()
+
+    inactive_count = recurring_transactions.filter(
+        is_active=False
+    ).count()
+
+    return render(
+        request,
+        'tracker/recurring_transactions.html',
+        {
+            'recurring_transactions': recurring_transactions,
+            'active_count': active_count,
+            'inactive_count': inactive_count,
+        }
+    )
+
+
+@login_required
+def add_recurring_transaction(request):
+    if request.method == 'POST':
+        form = RecurringTransactionForm(
+            request.POST
+        )
+
+        if form.is_valid():
+            recurring_transaction = form.save(
+                commit=False
+            )
+
+            recurring_transaction.user = request.user
+
+            recurring_transaction.next_date = (
+                calculate_next_recurring_date(
+                    recurring_transaction.start_date,
+                    recurring_transaction.frequency,
+                    recurring_transaction.day_of_month
+                )
+            )
+
+            recurring_transaction.save()
+
+            messages.success(
+                request,
+                'Recurring transaction created successfully.'
+            )
+
+            return redirect(
+                'recurring_transaction_list'
+            )
+
+    else:
+        form = RecurringTransactionForm()
+
+    return render(
+        request,
+        'tracker/add_recurring_transaction.html',
+        {
+            'form': form,
+        }
+    )
+
+
+
+
+@login_required
+def edit_recurring_transaction(
+    request,
+    recurring_id
+):
+    recurring_transaction = get_object_or_404(
+        request.user.recurring_transactions,
+        id=recurring_id
+    )
+
+    if request.method == 'POST':
+        form = RecurringTransactionForm(
+            request.POST,
+            instance=recurring_transaction
+        )
+
+        if form.is_valid():
+            recurring_transaction = form.save(
+                commit=False
+            )
+
+            # Recalculate the next scheduled occurrence
+            # whenever the schedule is edited.
+            recurring_transaction.next_date = (
+                calculate_next_recurring_date(
+                    recurring_transaction.start_date,
+                    recurring_transaction.frequency,
+                    recurring_transaction.day_of_month
+                )
+            )
+
+            recurring_transaction.save()
+
+            messages.success(
+                request,
+                'Recurring transaction updated successfully.'
+            )
+
+            return redirect(
+                'recurring_transaction_list'
+            )
+
+    else:
+        form = RecurringTransactionForm(
+            instance=recurring_transaction
+        )
+
+    return render(
+        request,
+        'tracker/edit_recurring_transaction.html',
+        {
+            'form': form,
+            'recurring_transaction': recurring_transaction,
+        }
+    )
+
+
+@login_required
+def toggle_recurring_transaction(
+    request,
+    recurring_id
+):
+    recurring_transaction = get_object_or_404(
+        request.user.recurring_transactions,
+        id=recurring_id
+    )
+
+    if request.method != 'POST':
+        return redirect(
+            'recurring_transaction_list'
+        )
+
+    recurring_transaction.is_active = (
+        not recurring_transaction.is_active
+    )
+
+    recurring_transaction.save(
+        update_fields=[
+            'is_active',
+            'updated_at',
+        ]
+    )
+
+    if recurring_transaction.is_active:
+        messages.success(
+            request,
+            'Recurring transaction activated.'
+        )
+    else:
+        messages.success(
+            request,
+            'Recurring transaction paused.'
+        )
+
+    return redirect(
+        'recurring_transaction_list'
+    )
+
+
+@login_required
+def delete_recurring_transaction(
+    request,
+    recurring_id
+):
+    recurring_transaction = get_object_or_404(
+        request.user.recurring_transactions,
+        id=recurring_id
+    )
+
+    if request.method == 'POST':
+        recurring_transaction.delete()
+
+        messages.success(
+            request,
+            'Recurring transaction deleted successfully.'
+        )
+
+    return redirect(
+        'recurring_transaction_list'
+    )
+
+
 
 @login_required
 def add_transaction(request):
@@ -474,19 +1384,50 @@ def edit_budget(request, budget_id):
 
 @login_required
 def report_view(request):
-    report_type = request.GET.get('report_type', 'monthly')
+    """
+    Build the interactive Reports & Analytics page.
+
+    NOTE:
+    This view powers only report.html.
+    export_report_pdf() and export_report_excel() remain untouched.
+    """
+    from calendar import monthrange
+    from datetime import timedelta
+    from decimal import Decimal
+
+    report_type = request.GET.get(
+        'report_type',
+        'monthly'
+    )
+
+    if report_type not in ('monthly', 'yearly'):
+        report_type = 'monthly'
 
     today = timezone.localdate()
+
+    # =========================================================
+    # SELECTED PERIOD
+    # =========================================================
 
     if report_type == 'yearly':
         start_date = today.replace(
             month=1,
             day=1
         )
+
         end_date = today.replace(
             month=12,
             day=31
         )
+
+        previous_start_date = start_date.replace(
+            year=start_date.year - 1
+        )
+
+        previous_end_date = end_date.replace(
+            year=end_date.year - 1
+        )
+
     else:
         start_date = today.replace(
             day=1
@@ -504,46 +1445,622 @@ def report_view(request):
                 day=1
             )
 
-        end_date = next_month - timedelta(days=1)
+        end_date = next_month - timedelta(
+            days=1
+        )
+
+        if start_date.month == 1:
+            previous_start_date = start_date.replace(
+                year=start_date.year - 1,
+                month=12
+            )
+        else:
+            previous_start_date = start_date.replace(
+                month=start_date.month - 1
+            )
+
+        previous_end_date = start_date - timedelta(
+            days=1
+        )
+
+    # =========================================================
+    # CURRENT + PREVIOUS TRANSACTIONS
+    # =========================================================
 
     transactions = request.user.transactions.filter(
         date__gte=start_date,
         date__lte=end_date
+    ).select_related(
+        'category'
     )
+
+    previous_transactions = request.user.transactions.filter(
+        date__gte=previous_start_date,
+        date__lte=previous_end_date
+    )
+
+    # =========================================================
+    # CORE FINANCIAL TOTALS
+    # =========================================================
 
     total_income = transactions.filter(
         type='income'
     ).aggregate(
         total=Sum('amount')
-    )['total'] or 0
+    )['total'] or Decimal('0')
 
     total_expenses = transactions.filter(
         type='expense'
     ).aggregate(
         total=Sum('amount')
-    )['total'] or 0
+    )['total'] or Decimal('0')
 
     balance = total_income - total_expenses
-    category_summary = transactions.values(
-        'category__name',
-        'category__type'
-    ).annotate(
-        total=Sum('amount')
-    ).order_by(
-        '-total'
+
+    transaction_count = transactions.count()
+
+    income_transaction_count = transactions.filter(
+        type='income'
+    ).count()
+
+    expense_transaction_count = transactions.filter(
+        type='expense'
+    ).count()
+
+    # =========================================================
+    # KEY FINANCIAL METRICS
+    # =========================================================
+
+    if total_income > 0:
+        savings_rate = (
+            balance / total_income
+        ) * Decimal('100')
+
+        expense_ratio = (
+            total_expenses / total_income
+        ) * Decimal('100')
+    else:
+        savings_rate = Decimal('0')
+        expense_ratio = Decimal('0')
+
+    days_in_period = (
+        end_date - start_date
+    ).days + 1
+
+    if days_in_period > 0:
+        average_daily_expense = (
+            total_expenses / Decimal(
+                str(days_in_period)
+            )
+        )
+    else:
+        average_daily_expense = Decimal('0')
+
+    if expense_transaction_count > 0:
+        average_expense_transaction = (
+            total_expenses / Decimal(
+                str(expense_transaction_count)
+            )
+        )
+    else:
+        average_expense_transaction = Decimal('0')
+
+    savings_rate = round(
+        savings_rate,
+        1
     )
+
+    expense_ratio = round(
+        expense_ratio,
+        1
+    )
+
+    average_daily_expense = round(
+        average_daily_expense,
+        2
+    )
+
+    average_expense_transaction = round(
+        average_expense_transaction,
+        2
+    )
+
+    # =========================================================
+    # PREVIOUS-PERIOD COMPARISON
+    # =========================================================
+
+    previous_income = previous_transactions.filter(
+        type='income'
+    ).aggregate(
+        total=Sum('amount')
+    )['total'] or Decimal('0')
+
+    previous_expenses = previous_transactions.filter(
+        type='expense'
+    ).aggregate(
+        total=Sum('amount')
+    )['total'] or Decimal('0')
+
+    previous_balance = (
+        previous_income - previous_expenses
+    )
+
+    def percentage_change(current, previous):
+        if previous == 0:
+            if current == 0:
+                return Decimal('0')
+            return Decimal('100')
+
+        return round(
+            (
+                (current - previous)
+                / previous
+            ) * Decimal('100'),
+            1
+        )
+
+    income_change = percentage_change(
+        total_income,
+        previous_income
+    )
+
+    expense_change = percentage_change(
+        total_expenses,
+        previous_expenses
+    )
+
+    balance_change = percentage_change(
+        balance,
+        previous_balance
+    )
+
+    # =========================================================
+    # CATEGORY ANALYSIS
+    # =========================================================
+
+    expense_categories = list(
+        transactions.filter(
+            type='expense'
+        ).values(
+            'category__name'
+        ).annotate(
+            total=Sum('amount')
+        ).order_by(
+            '-total'
+        )
+    )
+
+    income_categories = list(
+        transactions.filter(
+            type='income'
+        ).values(
+            'category__name'
+        ).annotate(
+            total=Sum('amount')
+        ).order_by(
+            '-total'
+        )
+    )
+
+    expense_category_summary = []
+
+    for item in expense_categories:
+        total = item['total'] or Decimal('0')
+
+        if total_expenses > 0:
+            percentage = round(
+                (
+                    total / total_expenses
+                ) * Decimal('100'),
+                1
+            )
+        else:
+            percentage = Decimal('0')
+
+        count = transactions.filter(
+            type='expense',
+            category__name=item['category__name']
+        ).count()
+
+        expense_category_summary.append({
+            'name': item['category__name'],
+            'total': total,
+            'percentage': percentage,
+            'count': count,
+        })
+
+    income_source_summary = []
+
+    for item in income_categories:
+        total = item['total'] or Decimal('0')
+
+        if total_income > 0:
+            percentage = round(
+                (
+                    total / total_income
+                ) * Decimal('100'),
+                1
+            )
+        else:
+            percentage = Decimal('0')
+
+        count = transactions.filter(
+            type='income',
+            category__name=item['category__name']
+        ).count()
+
+        income_source_summary.append({
+            'name': item['category__name'],
+            'total': total,
+            'percentage': percentage,
+            'count': count,
+        })
+
+    # =========================================================
+    # HIGHLIGHTS
+    # =========================================================
+
+    highest_expense = transactions.filter(
+        type='expense'
+    ).order_by(
+        '-amount'
+    ).first()
+
+    highest_income = transactions.filter(
+        type='income'
+    ).order_by(
+        '-amount'
+    ).first()
+
+    top_expense_category = (
+        expense_category_summary[0]
+        if expense_category_summary
+        else None
+    )
+
+    top_income_source = (
+        income_source_summary[0]
+        if income_source_summary
+        else None
+    )
+
+    # =========================================================
+    # PAYMENT-METHOD ANALYSIS
+    # =========================================================
+
+    payment_method_totals = list(
+        transactions.values(
+            'payment_method'
+        ).annotate(
+            total=Sum('amount')
+        ).order_by(
+            '-total'
+        )
+    )
+
+    payment_method_labels = {
+        'cash': 'Cash',
+        'upi': 'UPI / Wallet',
+        'card': 'Card',
+    }
+
+    payment_summary = []
+
+    for item in payment_method_totals:
+        amount = item['total'] or Decimal('0')
+        method = item['payment_method']
+
+        count = transactions.filter(
+            payment_method=method
+        ).count()
+
+        if total_income + total_expenses > 0:
+            percentage = round(
+                (
+                    amount
+                    / (
+                        total_income
+                        + total_expenses
+                    )
+                ) * Decimal('100'),
+                1
+            )
+        else:
+            percentage = Decimal('0')
+
+        payment_summary.append({
+            'method': payment_method_labels.get(
+                method,
+                method.title()
+            ),
+            'code': method,
+            'amount': amount,
+            'count': count,
+            'percentage': percentage,
+        })
+
+    if payment_summary:
+        most_used_payment_method = (
+            payment_summary[0]['method']
+        )
+    else:
+        most_used_payment_method = '—'
+
+    # =========================================================
+    # MONTHLY / DAILY TREND
+    # =========================================================
+
+    trend_labels = []
+    trend_income = []
+    trend_expenses = []
+    trend_savings = []
+
+    if report_type == 'yearly':
+        current_month = start_date
+
+        while current_month <= end_date:
+            if current_month.month == 12:
+                next_period = current_month.replace(
+                    year=current_month.year + 1,
+                    month=1,
+                    day=1
+                )
+            else:
+                next_period = current_month.replace(
+                    month=current_month.month + 1,
+                    day=1
+                )
+
+            period_end = (
+                next_period - timedelta(days=1)
+            )
+
+            month_transactions = transactions.filter(
+                date__gte=current_month,
+                date__lte=period_end
+            )
+
+            month_income = (
+                month_transactions.filter(
+                    type='income'
+                ).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0')
+            )
+
+            month_expenses = (
+                month_transactions.filter(
+                    type='expense'
+                ).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0')
+            )
+
+            month_savings = (
+                month_income - month_expenses
+            )
+
+            trend_labels.append(
+                current_month.strftime('%b')
+            )
+
+            trend_income.append(
+                float(month_income)
+            )
+
+            trend_expenses.append(
+                float(month_expenses)
+            )
+
+            trend_savings.append(
+                float(month_savings)
+            )
+
+            current_month = next_period
+
+    else:
+        current_day = start_date
+
+        while current_day <= end_date:
+            day_transactions = transactions.filter(
+                date=current_day
+            )
+
+            day_income = (
+                day_transactions.filter(
+                    type='income'
+                ).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0')
+            )
+
+            day_expenses = (
+                day_transactions.filter(
+                    type='expense'
+                ).aggregate(
+                    total=Sum('amount')
+                )['total'] or Decimal('0')
+            )
+
+            day_savings = (
+                day_income - day_expenses
+            )
+
+            trend_labels.append(
+                current_day.strftime('%d')
+            )
+
+            trend_income.append(
+                float(day_income)
+            )
+
+            trend_expenses.append(
+                float(day_expenses)
+            )
+
+            trend_savings.append(
+                float(day_savings)
+            )
+
+            current_day += timedelta(days=1)
+
+    # =========================================================
+    # BUDGET ANALYSIS
+    # =========================================================
+
+    budgets = request.user.budgets.filter(
+        start_date__lte=end_date,
+        end_date__gte=start_date
+    ).select_related(
+        'category'
+    ).order_by(
+        'category__name'
+    )
+
+    budget_analysis = []
+
+    for budget in budgets:
+        spent = transactions.filter(
+            category=budget.category,
+            type='expense',
+            date__gte=budget.start_date,
+            date__lte=budget.end_date
+        ).aggregate(
+            total=Sum('amount')
+        )['total'] or Decimal('0')
+
+        limit = budget.limit or Decimal('0')
+
+        if limit > 0:
+            utilization = round(
+                (
+                    spent / limit
+                ) * Decimal('100'),
+                1
+            )
+        else:
+            utilization = Decimal('0')
+
+        if utilization >= 100:
+            status = 'Exceeded'
+        elif utilization >= 80:
+            status = 'Near Limit'
+        else:
+            status = 'On Track'
+
+        budget_analysis.append({
+            'category': budget.category.name,
+            'limit': limit,
+            'spent': spent,
+            'remaining': limit - spent,
+            'utilization': utilization,
+            'status': status,
+            'period': budget.period.title(),
+        })
+
+    total_budget_limit = sum(
+        item['limit']
+        for item in budget_analysis
+    )
+
+    total_budget_spent = sum(
+        item['spent']
+        for item in budget_analysis
+    )
+
+    if total_budget_limit > 0:
+        overall_budget_utilization = round(
+            (
+                total_budget_spent
+                / total_budget_limit
+            ) * Decimal('100'),
+            1
+        )
+    else:
+        overall_budget_utilization = Decimal('0')
+
+    exceeded_budget_count = sum(
+        1
+        for item in budget_analysis
+        if item['status'] == 'Exceeded'
+    )
+
+    near_limit_budget_count = sum(
+        1
+        for item in budget_analysis
+        if item['status'] == 'Near Limit'
+    )
+
+    # =========================================================
+    # REPORT CONTEXT
+    # =========================================================
 
     return render(
         request,
         'tracker/report.html',
         {
+            # Existing fields — preserved.
             'report_type': report_type,
             'start_date': start_date,
             'end_date': end_date,
             'total_income': total_income,
             'total_expenses': total_expenses,
             'balance': balance,
-            'category_summary': category_summary,
+            'category_summary': (
+                transactions.values(
+                    'category__name',
+                    'category__type'
+                ).annotate(
+                    total=Sum('amount')
+                ).order_by(
+                    '-total'
+                )
+            ),
+
+            # Overview.
+            'transaction_count': transaction_count,
+            'income_transaction_count': income_transaction_count,
+            'expense_transaction_count': expense_transaction_count,
+            'savings_rate': savings_rate,
+            'expense_ratio': expense_ratio,
+            'average_daily_expense': average_daily_expense,
+            'average_expense_transaction': average_expense_transaction,
+
+            # Comparison.
+            'previous_start_date': previous_start_date,
+            'previous_end_date': previous_end_date,
+            'previous_income': previous_income,
+            'previous_expenses': previous_expenses,
+            'previous_balance': previous_balance,
+            'income_change': income_change,
+            'expense_change': expense_change,
+            'balance_change': balance_change,
+
+            # Highlights.
+            'highest_expense': highest_expense,
+            'highest_income': highest_income,
+            'top_expense_category': top_expense_category,
+            'top_income_source': top_income_source,
+            'most_used_payment_method': most_used_payment_method,
+
+            # Category + payment breakdowns.
+            'expense_category_summary': expense_category_summary,
+            'income_source_summary': income_source_summary,
+            'payment_summary': payment_summary,
+
+            # Trends for Chart.js.
+            'trend_labels': trend_labels,
+            'trend_income': trend_income,
+            'trend_expenses': trend_expenses,
+            'trend_savings': trend_savings,
+
+            # Budget analysis.
+            'budget_analysis': budget_analysis,
+            'total_budget_limit': total_budget_limit,
+            'total_budget_spent': total_budget_spent,
+            'overall_budget_utilization': overall_budget_utilization,
+            'exceeded_budget_count': exceeded_budget_count,
+            'near_limit_budget_count': near_limit_budget_count,
         }
     )
 

@@ -12,524 +12,1734 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Reports & Analytics - Expense Tracker</title>
+    <title>
+        Reports & Analytics - Expense Tracker
+    </title>
 
-    <!-- Global Styles -->
     <link
         rel="stylesheet"
         href="{% static 'tracker/css/style.css' %}"
     >
 
-    <!-- Expense Tracker Favicon -->
+    <!-- Global Theme -->
     <link
-        rel="icon"
-        type="image/png"
-        href="{% static 'tracker/favicon.png' %}?v=3"
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
     >
 
-    <link
-        rel="shortcut icon"
-        href="{% static 'tracker/favicon.png' %}?v=3"
-    >
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
+
 
     <style>
 
-        body {
-            background: #f5f7fb;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-soft: #eef2ff;
+
+            --background: #f5f7fb;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+
+            --border: #e5e7eb;
+
+            --text: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+
+            --green: #059669;
+            --green-soft: #ecfdf5;
+
+            --red: #dc2626;
+            --red-soft: #fef2f2;
+
+            --amber: #d97706;
+            --amber-soft: #fffbeb;
+
+            --blue: #2563eb;
+            --blue-soft: #eff6ff;
+
+            --shadow-sm:
+                0 4px 14px rgba(15, 23, 42, 0.05);
+
+            --shadow-md:
+                0 10px 28px rgba(15, 23, 42, 0.08);
         }
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            background: var(--background);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+
+        a {
+            text-decoration: none;
+        }
+
 
         .page {
+
             min-height: 100vh;
-            padding: 30px;
+
+            padding:
+                30px 22px 45px;
         }
 
+
         .page-container {
-            width: min(1150px, 94%);
+
+            width:
+                min(1280px, 100%);
+
             margin: auto;
         }
 
 
-        /* ================= HEADER ================= */
+        /* =====================================================
+           HEADER
+           ===================================================== */
 
         .topbar {
+
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
+
+            align-items:
+                flex-start;
+
+            justify-content:
+                space-between;
 
             gap: 20px;
-            margin-bottom: 25px;
+
+            margin-bottom: 24px;
         }
+
 
         .page-title h1 {
+
+            margin: 0;
+
             font-size: 30px;
-            margin-bottom: 5px;
+
+            line-height: 1.1;
+
+            font-weight: 800;
+
+            letter-spacing:
+                -0.5px;
         }
 
+
         .page-title p {
-            color: #6b7280;
+
+            margin:
+                8px 0 0;
+
+            color:
+                var(--text-secondary);
+
             font-size: 14px;
         }
 
-        .top-btn {
-            display: inline-flex;
+
+        .top-actions {
+
+            display: flex;
+
             align-items: center;
+
+            gap: 9px;
+        }
+
+
+        .top-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
             justify-content: center;
+
             gap: 7px;
 
-            padding: 10px 15px;
+            height: 40px;
 
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 9px;
+            padding:
+                0 14px;
 
-            color: #374151;
+            background:
+                var(--surface);
 
-            font-size: 13px;
-            font-weight: 600;
+            color:
+                var(--text);
 
-            box-shadow: var(--shadow-sm);
+            border:
+                1px solid var(--border);
 
-            transition: 0.2s ease;
+            border-radius: 10px;
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            box-shadow:
+                var(--shadow-sm);
+
+            transition:
+                0.2s ease;
         }
+
 
         .top-btn:hover {
-            color: #4f46e5;
-            border-color: #6366f1;
-            transform: translateY(-1px);
+
+            color:
+                var(--primary);
+
+            border-color:
+                var(--primary);
+
+            transform:
+                translateY(-1px);
         }
 
 
-        /* ================= REPORT SELECTOR ================= */
+        /* =====================================================
+           REPORT SELECTOR
+           ===================================================== */
 
         .control-card {
-            background: white;
 
-            border: 1px solid #e5e7eb;
+            display: flex;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
+
+            gap: 20px;
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
             border-radius: 16px;
 
-            padding: 22px;
+            padding: 20px;
 
-            margin-bottom: 25px;
+            margin-bottom: 24px;
 
-            box-shadow: var(--shadow-sm);
+            box-shadow:
+                var(--shadow-sm);
         }
 
-        .control-title {
+
+        .control-info h2 {
+
+            margin: 0 0 5px;
+
             font-size: 17px;
-            margin-bottom: 5px;
         }
 
-        .control-description {
-            color: #9ca3af;
+
+        .control-info p {
+
+            margin: 0;
+
+            color:
+                var(--text-secondary);
+
             font-size: 12px;
-            margin-bottom: 18px;
         }
 
-        .control-row {
+
+        .control-form {
+
             display: flex;
-            align-items: flex-end;
+
+            align-items:
+                flex-end;
+
+            gap: 9px;
+
             flex-wrap: wrap;
-            gap: 12px;
         }
 
-        .selector-group {
-            min-width: 220px;
-        }
 
         .selector-group label {
+
             display: block;
 
             margin-bottom: 7px;
 
-            color: #4b5563;
+            color:
+                var(--text-secondary);
 
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+
+            font-weight: 750;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                0.35px;
         }
 
+
         .selector-group select {
-            width: 100%;
 
-            padding: 11px 12px;
+            min-width: 190px;
 
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
+            height: 40px;
 
-            background: white;
+            padding:
+                0 12px;
 
-            color: #374151;
+            border:
+                1px solid var(--border);
 
-            font-size: 13px;
+            border-radius: 9px;
+
+            background:
+                var(--surface);
+
+            color:
+                var(--text);
+
+            font-size: 12px;
 
             outline: none;
         }
 
-        .selector-group select:focus {
-            border-color: #6366f1;
-
-            box-shadow:
-                0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
 
         .generate-btn {
+
             height: 40px;
 
-            padding: 0 17px;
+            padding:
+                0 16px;
 
             border: none;
-            border-radius: 8px;
 
-            background: #6366f1;
-            color: white;
+            border-radius: 9px;
 
-            font-size: 13px;
-            font-weight: 600;
+            background:
+                var(--primary);
+
+            color:
+                #ffffff;
+
+            font-size: 12px;
+
+            font-weight: 750;
 
             cursor: pointer;
 
-            transition: 0.2s ease;
+            transition:
+                0.2s ease;
         }
+
 
         .generate-btn:hover {
-            background: #4f46e5;
-            transform: translateY(-1px);
+
+            background:
+                var(--primary-dark);
+
+            transform:
+                translateY(-1px);
         }
 
-
-        /* ================= EXPORT BUTTONS ================= */
 
         .export-actions {
+
             display: flex;
-            gap: 10px;
+
+            gap: 8px;
         }
+
 
         .export-btn {
+
             display: inline-flex;
+
             align-items: center;
+
             justify-content: center;
-            gap: 7px;
+
+            gap: 6px;
 
             height: 40px;
-            padding: 0 15px;
 
-            border-radius: 8px;
+            padding:
+                0 13px;
 
-            font-size: 12px;
-            font-weight: 600;
+            border-radius: 9px;
 
-            transition: 0.2s ease;
+            font-size: 11px;
+
+            font-weight: 750;
+
+            transition:
+                0.2s ease;
         }
+
 
         .pdf-btn {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #b91c1c;
+
+            background:
+                var(--red-soft);
+
+            border:
+                1px solid #fecaca;
+
+            color:
+                #b91c1c;
         }
 
-        .pdf-btn:hover {
-            background: #fee2e2;
-        }
 
         .excel-btn {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            color: #047857;
+
+            background:
+                var(--green-soft);
+
+            border:
+                1px solid #a7f3d0;
+
+            color:
+                #047857;
         }
 
+
+        .pdf-btn:hover,
         .excel-btn:hover {
-            background: #d1fae5;
+
+            transform:
+                translateY(-1px);
         }
 
 
-        /* ================= REPORT HEADER ================= */
+        /* =====================================================
+           REPORT HEADER
+           ===================================================== */
 
-        .report-header {
+        .report-heading {
+
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
 
             gap: 20px;
 
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
-        .report-header h2 {
+
+        .report-heading h2 {
+
+            margin: 0;
+
             font-size: 21px;
-            margin-bottom: 4px;
+
+            font-weight: 800;
         }
+
 
         .report-period {
-            color: #9ca3af;
+
+            color:
+                var(--text-muted);
+
             font-size: 12px;
+
+            margin-top: 5px;
         }
 
 
-        /* ================= SUMMARY ================= */
+        .dataset-badge {
 
-        .summary-grid {
+            padding:
+                7px 10px;
+
+            border-radius: 8px;
+
+            background:
+                var(--primary-soft);
+
+            color:
+                var(--primary-dark);
+
+            font-size: 11px;
+
+            font-weight: 750;
+        }
+
+
+        /* =====================================================
+           METRIC CARDS
+           ===================================================== */
+
+        .metrics-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(6, minmax(0, 1fr));
+
+            gap: 12px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .metric-card {
+
+            min-width: 0;
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 14px;
+
+            padding: 17px;
+
+            box-shadow:
+                var(--shadow-sm);
+
+            transition:
+                0.2s ease;
+        }
+
+
+        .metric-card:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                var(--shadow-md);
+        }
+
+
+        .metric-label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color:
+                var(--text-secondary);
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                0.4px;
+        }
+
+
+        .metric-value {
+
+            font-size: 22px;
+
+            font-weight: 800;
+
+            line-height: 1.1;
+
+            word-break: break-word;
+        }
+
+
+        .metric-value.green {
+            color: var(--green);
+        }
+
+
+        .metric-value.red {
+            color: var(--red);
+        }
+
+
+        .metric-value.indigo {
+            color: var(--primary-dark);
+        }
+
+
+        .metric-value.blue {
+            color: var(--blue);
+        }
+
+
+        .metric-sub {
+
+            margin-top: 7px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
+        }
+
+
+        /* =====================================================
+           COMPARISON CARDS
+           ===================================================== */
+
+        .comparison-grid {
+
             display: grid;
 
             grid-template-columns:
                 repeat(3, minmax(0, 1fr));
 
-            gap: 18px;
+            gap: 14px;
 
-            margin-bottom: 25px;
+            margin-bottom: 22px;
         }
 
-        .summary-card {
-            background: white;
 
-            border: 1px solid #e5e7eb;
-            border-radius: 15px;
+        .comparison-card {
 
-            padding: 21px;
+            background:
+                var(--surface);
 
-            box-shadow: var(--shadow-sm);
+            border:
+                1px solid var(--border);
 
-            transition: 0.2s ease;
+            border-radius: 14px;
+
+            padding: 17px;
+
+            box-shadow:
+                var(--shadow-sm);
         }
 
-        .summary-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+
+        .comparison-top {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content:
+                space-between;
+
+            gap: 10px;
+
+            margin-bottom: 11px;
         }
 
-        .summary-label {
-            display: block;
 
-            margin-bottom: 9px;
+        .comparison-title {
 
-            color: #6b7280;
+            color:
+                var(--text-secondary);
 
             font-size: 11px;
-            font-weight: 700;
 
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
+            font-weight: 750;
 
-        .summary-value {
-            font-size: 25px;
-            font-weight: 700;
-        }
+            text-transform:
+                uppercase;
 
-        .income {
-            color: #059669;
-        }
-
-        .expense {
-            color: #dc2626;
-        }
-
-        .balance {
-            color: #4f46e5;
+            letter-spacing:
+                0.35px;
         }
 
 
-        /* ================= CATEGORY TABLE ================= */
+        .comparison-current {
+
+            font-size: 22px;
+
+            font-weight: 800;
+        }
+
+
+        .comparison-previous {
+
+            margin-top: 4px;
+
+            color:
+                var(--text-muted);
+
+            font-size: 11px;
+        }
+
+
+        .change-badge {
+
+            display: inline-flex;
+
+            padding:
+                5px 8px;
+
+            border-radius: 999px;
+
+            font-size: 10px;
+
+            font-weight: 800;
+        }
+
+
+        .change-neutral {
+
+            background:
+                var(--blue-soft);
+
+            color:
+                #1d4ed8;
+        }
+
+
+        .change-positive {
+
+            background:
+                var(--green-soft);
+
+            color:
+                var(--green);
+        }
+
+
+        .change-negative {
+
+            background:
+                var(--red-soft);
+
+            color:
+                var(--red);
+        }
+
+
+        /* =====================================================
+           SECTION
+           ===================================================== */
+
+        .section {
+
+            margin-bottom: 22px;
+        }
+
+
+        .section-header {
+
+            display: flex;
+
+            align-items:
+                flex-end;
+
+            justify-content:
+                space-between;
+
+            gap: 15px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .section-header h2 {
+
+            margin: 0;
+
+            font-size: 17px;
+
+            font-weight: 800;
+        }
+
+
+        .section-header p {
+
+            margin:
+                4px 0 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 11px;
+        }
+
+
+        /* =====================================================
+           CHART GRID
+           ===================================================== */
+
+        .chart-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                2fr 1fr;
+
+            gap: 15px;
+        }
+
+
+        .chart-card {
+
+            min-width: 0;
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            padding: 17px;
+
+            box-shadow:
+                var(--shadow-sm);
+        }
+
+
+        .chart-card-header {
+
+            display: flex;
+
+            align-items:
+                flex-start;
+
+            justify-content:
+                space-between;
+
+            gap: 10px;
+
+            margin-bottom: 12px;
+        }
+
+
+        .chart-card-header h3 {
+
+            margin: 0;
+
+            font-size: 14px;
+        }
+
+
+        .chart-card-header span {
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
+        }
+
+
+        .chart-container {
+
+            position: relative;
+
+            width: 100%;
+
+            height: 300px;
+        }
+
+
+        .chart-container.small {
+
+            height: 260px;
+        }
+
+
+        /* =====================================================
+           THREE CHARTS
+           ===================================================== */
+
+        .three-column-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 15px;
+        }
+
+
+        /* =====================================================
+           ANALYSIS TABLES
+           ===================================================== */
+
+        .analysis-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            gap: 15px;
+        }
+
 
         .table-card {
-            background: white;
 
-            border: 1px solid #e5e7eb;
-            border-radius: 16px;
+            min-width: 0;
 
-            overflow: hidden;
+            background:
+                var(--surface);
 
-            box-shadow: var(--shadow-sm);
+            border:
+                1px solid var(--border);
+
+            border-radius: 15px;
+
+            overflow:
+                hidden;
+
+            box-shadow:
+                var(--shadow-sm);
         }
 
-        .table-header {
-            padding: 20px 22px;
 
-            border-bottom: 1px solid #e5e7eb;
+        .table-card-header {
+
+            padding:
+                16px 17px;
+
+            border-bottom:
+                1px solid var(--border);
         }
 
-        .table-header h2 {
-            font-size: 17px;
-            margin-bottom: 3px;
+
+        .table-card-header h3 {
+
+            margin: 0;
+
+            font-size: 14px;
         }
 
-        .table-header p {
-            color: #9ca3af;
-            font-size: 12px;
+
+        .table-card-header p {
+
+            margin:
+                4px 0 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 10px;
         }
+
 
         .table-wrapper {
-            overflow-x: auto;
+
+            overflow-x:
+                auto;
         }
 
+
         table {
+
             width: 100%;
-            min-width: 600px;
-            border-collapse: collapse;
+
+            border-collapse:
+                collapse;
+
+            min-width: 460px;
         }
+
 
         th,
         td {
-            padding: 14px 20px;
 
-            text-align: left;
+            padding:
+                11px 14px;
 
-            border-bottom: 1px solid #eef0f3;
+            text-align:
+                left;
 
-            font-size: 13px;
+            font-size: 11px;
+
+            border-bottom:
+                1px solid var(--border);
         }
+
 
         th {
-            background: #f8fafc;
 
-            color: #64748b;
+            background:
+                var(--surface-soft);
 
-            font-size: 11px;
-            font-weight: 700;
+            color:
+                var(--text-secondary);
 
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            font-size: 9px;
+
+            font-weight: 800;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                0.3px;
         }
 
-        tbody tr:hover {
-            background: #fafbff;
-        }
 
         tbody tr:last-child td {
-            border-bottom: none;
-        }
 
-        .category {
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .type-badge {
-            display: inline-flex;
-
-            padding: 5px 9px;
-
-            border-radius: 20px;
-
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .income-badge {
-            background: #d1fae5;
-            color: #047857;
-        }
-
-        .expense-badge {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .total {
-            font-weight: 700;
+            border-bottom:
+                none;
         }
 
 
-        /* ================= EMPTY ================= */
+        tbody tr:hover {
 
-        .empty-state {
-            padding: 60px 25px;
-
-            text-align: center;
+            background:
+                #fafbff;
         }
 
-        .empty-icon {
-            width: 65px;
-            height: 65px;
+
+        .strong {
+
+            font-weight:
+                750;
+        }
+
+
+        .amount-green {
+
+            color:
+                var(--green);
+
+            font-weight:
+                800;
+        }
+
+
+        .amount-red {
+
+            color:
+                var(--red);
+
+            font-weight:
+                800;
+        }
+
+
+        .percentage {
+
+            color:
+                var(--text-secondary);
+
+            font-weight:
+                700;
+        }
+
+
+        /* =====================================================
+           PROGRESS BAR
+           ===================================================== */
+
+        .progress-cell {
+
+            min-width:
+                150px;
+        }
+
+
+        .progress-meta {
 
             display: flex;
+
             align-items: center;
-            justify-content: center;
 
-            margin: 0 auto 17px;
+            justify-content:
+                space-between;
 
-            background: #eef2ff;
+            gap: 10px;
 
-            border-radius: 18px;
-
-            font-size: 28px;
+            margin-bottom:
+                5px;
         }
+
+
+        .progress-track {
+
+            width: 100%;
+
+            height: 7px;
+
+            overflow: hidden;
+
+            border-radius:
+                99px;
+
+            background:
+                #eef0f3;
+        }
+
+
+        .progress-bar {
+
+            height: 100%;
+
+            border-radius:
+                inherit;
+
+            background:
+                var(--primary);
+        }
+
+
+        .progress-bar.warning {
+
+            background:
+                var(--amber);
+        }
+
+
+        .progress-bar.danger {
+
+            background:
+                var(--red);
+        }
+
+
+        .status-badge {
+
+            display: inline-flex;
+
+            padding:
+                4px 7px;
+
+            border-radius:
+                999px;
+
+            font-size: 9px;
+
+            font-weight:
+                800;
+        }
+
+
+        .status-ok {
+
+            background:
+                var(--green-soft);
+
+            color:
+                var(--green);
+        }
+
+
+        .status-warning {
+
+            background:
+                var(--amber-soft);
+
+            color:
+                var(--amber);
+        }
+
+
+        .status-danger {
+
+            background:
+                var(--red-soft);
+
+            color:
+                var(--red);
+        }
+
+
+        /* =====================================================
+           HIGHLIGHTS
+           ===================================================== */
+
+        .highlights-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 14px;
+        }
+
+
+        .highlight-card {
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                14px;
+
+            padding:
+                17px;
+
+            box-shadow:
+                var(--shadow-sm);
+        }
+
+
+        .highlight-icon {
+
+            width:
+                35px;
+
+            height:
+                35px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            margin-bottom:
+                12px;
+
+            border-radius:
+                10px;
+
+            background:
+                var(--primary-soft);
+
+            font-size:
+                17px;
+        }
+
+
+        .highlight-label {
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            text-transform:
+                uppercase;
+        }
+
+
+        .highlight-value {
+
+            margin-top:
+                5px;
+
+            font-size:
+                15px;
+
+            font-weight:
+                800;
+        }
+
+
+        .highlight-sub {
+
+            margin-top:
+                4px;
+
+            color:
+                var(--text-secondary);
+
+            font-size:
+                10px;
+        }
+
+
+        /* =====================================================
+           EMPTY
+           ===================================================== */
+
+        .empty-state {
+
+            background:
+                var(--surface);
+
+            border:
+                1px solid var(--border);
+
+            border-radius:
+                15px;
+
+            padding:
+                55px 25px;
+
+            text-align:
+                center;
+
+            box-shadow:
+                var(--shadow-sm);
+        }
+
+
+        .empty-icon {
+
+            width:
+                60px;
+
+            height:
+                60px;
+
+            margin:
+                0 auto 13px;
+
+            display: flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border-radius:
+                16px;
+
+            background:
+                var(--primary-soft);
+
+            font-size:
+                26px;
+        }
+
 
         .empty-state h3 {
-            font-size: 18px;
-            margin-bottom: 6px;
+
+            margin:
+                0 0 6px;
+
+            font-size:
+                17px;
         }
+
 
         .empty-state p {
-            color: #9ca3af;
-            font-size: 13px;
+
+            margin:
+                0;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                12px;
         }
 
 
-        /* ================= FOOTER ================= */
+        /* =====================================================
+           RESPONSIVE
+           ===================================================== */
 
-        .footer {
-            margin-top: 20px;
+
+        /* =====================================================
+           DARK MODE — GLOBAL REPORT OVERRIDES
+           ===================================================== */
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+
+            --background: #0b1020;
+            --surface: #151b2d;
+            --surface-soft: #1b2338;
+            --border: #2b354d;
+            --text: #f8fafc;
+            --text-secondary: #a7b0c2;
+            --text-muted: #8792a8;
+
+            --primary-soft: rgba(99, 102, 241, 0.15);
+            --green-soft: rgba(5, 150, 105, 0.14);
+            --red-soft: rgba(220, 38, 38, 0.14);
+            --amber-soft: rgba(217, 119, 6, 0.14);
+            --blue-soft: rgba(37, 99, 235, 0.14);
+
+            --shadow-sm:
+                0 6px 18px rgba(0, 0, 0, 0.18);
+
+            --shadow-md:
+                0 12px 32px rgba(0, 0, 0, 0.25);
         }
 
-        .footer a {
-            color: #6b7280;
 
-            font-size: 13px;
-            font-weight: 600;
-
-            transition: 0.2s ease;
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                var(--background);
         }
 
-        .footer a:hover {
-            color: #4f46e5;
+
+        html[data-theme="dark"] .top-btn {
+            background: var(--surface);
+            color: var(--text);
         }
 
 
-        /* ================= RESPONSIVE ================= */
+        html[data-theme="dark"] .top-btn:hover {
+            background: #1b2338;
+            color: #a5b4fc;
+        }
 
-        @media (max-width: 800px) {
+
+        html[data-theme="dark"] .control-card,
+        html[data-theme="dark"] .metric-card,
+        html[data-theme="dark"] .comparison-card,
+        html[data-theme="dark"] .chart-card,
+        html[data-theme="dark"] .table-card,
+        html[data-theme="dark"] .highlight-card,
+        html[data-theme="dark"] .empty-state {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: var(--border);
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.20);
+        }
+
+
+        html[data-theme="dark"] .control-card:hover,
+        html[data-theme="dark"] .metric-card:hover,
+        html[data-theme="dark"] .comparison-card:hover,
+        html[data-theme="dark"] .highlight-card:hover {
+            border-color: #3b4762;
+        }
+
+
+        html[data-theme="dark"] .selector-group select {
+            background: #0f1728;
+            color: var(--text);
+            border-color: #34405a;
+        }
+
+
+        html[data-theme="dark"] .selector-group select:focus {
+            border-color: #718cf5;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(113, 140, 245, 0.16);
+        }
+
+
+        html[data-theme="dark"] .pdf-btn {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(248, 113, 113, 0.26);
+            color: #fca5a5;
+        }
+
+
+        html[data-theme="dark"] .excel-btn {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: rgba(52, 211, 153, 0.26);
+            color: #6ee7b7;
+        }
+
+
+        html[data-theme="dark"] .dataset-badge,
+        html[data-theme="dark"] .highlight-icon {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .metric-value.indigo,
+        html[data-theme="dark"] .metric-value.blue {
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .change-neutral {
+            background: rgba(37, 99, 235, 0.14);
+            color: #93c5fd;
+        }
+
+
+        html[data-theme="dark"] .change-positive {
+            background: rgba(5, 150, 105, 0.14);
+            color: #6ee7b7;
+        }
+
+
+        html[data-theme="dark"] .change-negative {
+            background: rgba(220, 38, 38, 0.14);
+            color: #fca5a5;
+        }
+
+
+        html[data-theme="dark"] th {
+            background: var(--surface-soft);
+            color: var(--text-secondary);
+        }
+
+
+        html[data-theme="dark"] th,
+        html[data-theme="dark"] td {
+            border-bottom-color: var(--border);
+        }
+
+
+        html[data-theme="dark"] tbody tr:hover {
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        html[data-theme="dark"] .amount-green {
+            color: #34d399;
+        }
+
+
+        html[data-theme="dark"] .amount-red {
+            color: #f87171;
+        }
+
+
+        html[data-theme="dark"] .status-ok {
+            background: rgba(16, 185, 129, 0.14);
+            color: #6ee7b7;
+        }
+
+
+        html[data-theme="dark"] .status-warning {
+            background: rgba(245, 158, 11, 0.14);
+            color: #fbbf24;
+        }
+
+
+        html[data-theme="dark"] .status-danger {
+            background: rgba(239, 68, 68, 0.14);
+            color: #fca5a5;
+        }
+
+
+        html[data-theme="dark"] .progress-track {
+            background: #293349;
+        }
+
+
+        html[data-theme="dark"] .empty-icon {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+
+        html[data-theme="dark"] .empty-state h3 {
+            color: #f8fafc;
+        }
+
+
+        /* Keep the chart area readable in dark mode. */
+        html[data-theme="dark"] .chart-card canvas {
+            color: #cbd5e1;
+        }
+
+
+        @media (max-width: 700px) {
+
+            html[data-theme="dark"] .top-btn {
+                background: #151b2d;
+            }
+
+        }
+
+        @media (max-width: 1150px) {
+
+            .metrics-grid {
+
+                grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            }
+
+
+            .highlights-grid {
+
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+
+            .three-column-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+        }
+
+
+        @media (max-width: 900px) {
+
+            .control-card {
+
+                align-items:
+                    stretch;
+
+                flex-direction:
+                    column;
+            }
+
+
+            .control-form {
+
+                align-items:
+                    stretch;
+            }
+
+
+            .chart-grid,
+            .analysis-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .comparison-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+
+        @media (max-width: 700px) {
 
             .page {
-                padding: 20px 12px;
+
+                padding:
+                    20px 12px 35px;
             }
 
-            .page-container {
-                width: 100%;
-            }
 
             .topbar {
-                flex-direction: column;
+
+                flex-direction:
+                    column;
             }
 
-            .summary-grid {
-                grid-template-columns: 1fr;
+
+            .top-actions {
+
+                width:
+                    100%;
             }
 
-            .control-row {
-                flex-direction: column;
-                align-items: stretch;
+
+            .top-btn {
+
+                flex:
+                    1;
             }
 
-            .selector-group {
-                min-width: 100%;
+
+            .metrics-grid {
+
+                grid-template-columns:
+                    1fr 1fr;
             }
 
-            .generate-btn {
-                width: 100%;
+
+            .three-column-grid,
+            .highlights-grid {
+
+                grid-template-columns:
+                    1fr;
             }
+
+
+            .report-heading {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+            }
+
 
             .export-actions {
-                width: 100%;
+
+                width:
+                    100%;
             }
+
 
             .export-btn {
-                flex: 1;
+
+                flex:
+                    1;
             }
 
-            .report-header {
-                align-items: flex-start;
-                flex-direction: column;
+
+            .control-form {
+
+                flex-direction:
+                    column;
             }
 
+
+            .selector-group,
+            .selector-group select,
+            .generate-btn {
+
+                width:
+                    100%;
+            }
+        }
+
+
+        @media (max-width: 480px) {
+
+            .metrics-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .page-title h1 {
+
+                font-size:
+                    25px;
+            }
         }
 
     </style>
@@ -544,7 +1754,9 @@
     <div class="page-container">
 
 
-        <!-- ================= HEADER ================= -->
+        <!-- =================================================
+             HEADER
+             ================================================= -->
 
         <div class="topbar">
 
@@ -555,103 +1767,109 @@
                 </h1>
 
                 <p>
-                    Analyze your financial activity and export reports.
+                    Deep financial analysis for your selected reporting period.
                 </p>
 
             </div>
 
 
-            <a
-                href="{% url 'dashboard' %}"
-                class="top-btn"
-            >
-                ← Dashboard
-            </a>
+            <div class="top-actions">
+
+                <a
+                    href="{% url 'dashboard' %}"
+                    class="top-btn"
+                >
+                    ← Dashboard
+                </a>
+
+            </div>
 
         </div>
 
 
-
-        <!-- ================= CONTROLS ================= -->
+        <!-- =================================================
+             REPORT CONTROLS
+             ================================================= -->
 
         <div class="control-card">
 
-            <h2 class="control-title">
-                Generate Report
-            </h2>
+            <div class="control-info">
 
-            <p class="control-description">
-                Select a reporting period and choose an export format.
-            </p>
+                <h2>
+                    Analysis Period
+                </h2>
 
+                <p>
+                    Switch between monthly and yearly financial intelligence.
+                </p>
 
-            <form method="GET">
-
-                <div class="control-row">
-
-
-                    <div class="selector-group">
-
-                        <label for="report_type">
-                            Report Type
-                        </label>
-
-                        <select
-                            name="report_type"
-                            id="report_type"
-                        >
-
-                            <option
-                                value="monthly"
-                                {% if report_type == "monthly" %}
-                                    selected
-                                {% endif %}
-                            >
-                                Monthly Report
-                            </option>
-
-                            <option
-                                value="yearly"
-                                {% if report_type == "yearly" %}
-                                    selected
-                                {% endif %}
-                            >
-                                Yearly Report
-                            </option>
-
-                        </select>
-
-                    </div>
+            </div>
 
 
+            <form
+                method="GET"
+                class="control-form"
+            >
 
-                    <button
-                        type="submit"
-                        class="generate-btn"
+                <div class="selector-group">
+
+                    <label for="report_type">
+                        Report Type
+                    </label>
+
+                    <select
+                        name="report_type"
+                        id="report_type"
                     >
-                        Generate Report
-                    </button>
 
-
-
-                    <div class="export-actions">
-
-                        <a
-                            href="{% url 'export_report_pdf' %}?report_type={{ report_type }}"
-                            class="export-btn pdf-btn"
+                        <option
+                            value="monthly"
+                            {% if report_type == "monthly" %}
+                                selected
+                            {% endif %}
                         >
-                            ↓ PDF
-                        </a>
+                            Monthly Report
+                        </option>
 
-
-                        <a
-                            href="{% url 'export_report_excel' %}?report_type={{ report_type }}"
-                            class="export-btn excel-btn"
+                        <option
+                            value="yearly"
+                            {% if report_type == "yearly" %}
+                                selected
+                            {% endif %}
                         >
-                            ↓ Excel
-                        </a>
+                            Yearly Report
+                        </option>
 
-                    </div>
+                    </select>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="generate-btn"
+                >
+                    Generate Analysis
+                </button>
+
+
+                <!-- EXISTING EXPORT ROUTES — UNCHANGED -->
+
+                <div class="export-actions">
+
+                    <a
+                        href="{% url 'export_report_pdf' %}?report_type={{ report_type }}"
+                        class="export-btn pdf-btn"
+                    >
+                        ↓ PDF
+                    </a>
+
+                    <a
+                        href="{% url 'export_report_excel' %}?report_type={{ report_type }}"
+                        class="export-btn excel-btn"
+                    >
+                        ↓ Excel
+                    </a>
 
                 </div>
 
@@ -660,212 +1878,2018 @@
         </div>
 
 
+        <!-- =================================================
+             REPORT HEADING
+             ================================================= -->
 
-        <!-- ================= REPORT TITLE ================= -->
-
-        <div class="report-header">
+        <div class="report-heading">
 
             <div>
 
                 <h2>
-                    {{ report_type|title }} Report
+                    {{ report_type|title }} Financial Report
                 </h2>
 
                 <div class="report-period">
+
                     {{ start_date|date:"d M Y" }}
+
                     –
+
                     {{ end_date|date:"d M Y" }}
+
                 </div>
+
+            </div>
+
+
+            <div class="dataset-badge">
+
+                {{ transaction_count }} transaction{{ transaction_count|pluralize }}
 
             </div>
 
         </div>
 
 
-
-        <!-- ================= SUMMARY ================= -->
-
-        <div class="summary-grid">
+        {% if transaction_count %}
 
 
-            <div class="summary-card">
+            <!-- =================================================
+                 CORE METRICS
+                 ================================================= -->
 
-                <span class="summary-label">
-                    Total Income
-                </span>
+            <section class="section">
 
-                <div class="summary-value income">
-                    ₹{{ total_income|floatformat:2 }}
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Financial Overview
+                        </h2>
+
+                        <p>
+                            Core performance indicators for the selected period.
+                        </p>
+
+                    </div>
+
                 </div>
 
-            </div>
+
+                <div class="metrics-grid">
 
 
+                    <div class="metric-card">
 
-            <div class="summary-card">
+                        <span class="metric-label">
+                            Total Income
+                        </span>
 
-                <span class="summary-label">
-                    Total Expenses
-                </span>
+                        <div class="metric-value green">
+                            ₹{{ total_income|floatformat:2 }}
+                        </div>
 
-                <div class="summary-value expense">
-                    ₹{{ total_expenses|floatformat:2 }}
+                        <div class="metric-sub">
+                            {{ income_transaction_count }} income transaction{{ income_transaction_count|pluralize }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-card">
+
+                        <span class="metric-label">
+                            Total Expenses
+                        </span>
+
+                        <div class="metric-value red">
+                            ₹{{ total_expenses|floatformat:2 }}
+                        </div>
+
+                        <div class="metric-sub">
+                            {{ expense_transaction_count }} expense transaction{{ expense_transaction_count|pluralize }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-card">
+
+                        <span class="metric-label">
+                            Net Savings
+                        </span>
+
+                        <div class="metric-value indigo">
+                            ₹{{ balance|floatformat:2 }}
+                        </div>
+
+                        <div class="metric-sub">
+                            Income − expenses
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-card">
+
+                        <span class="metric-label">
+                            Savings Rate
+                        </span>
+
+                        <div class="metric-value blue">
+                            {{ savings_rate|floatformat:1 }}%
+                        </div>
+
+                        <div class="metric-sub">
+                            Portion of income retained
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-card">
+
+                        <span class="metric-label">
+                            Daily Expense
+                        </span>
+
+                        <div class="metric-value red">
+                            ₹{{ average_daily_expense|floatformat:2 }}
+                        </div>
+
+                        <div class="metric-sub">
+                            Average across the period
+                        </div>
+
+                    </div>
+
+
+                    <div class="metric-card">
+
+                        <span class="metric-label">
+                            Expense Ratio
+                        </span>
+
+                        <div class="metric-value amber">
+                            {{ expense_ratio|floatformat:1 }}%
+                        </div>
+
+                        <div class="metric-sub">
+                            Expenses compared with income
+                        </div>
+
+                    </div>
+
                 </div>
 
-            </div>
+            </section>
 
 
+            <!-- =================================================
+                 PERIOD COMPARISON
+                 ================================================= -->
 
-            <div class="summary-card">
+            <section class="section">
 
-                <span class="summary-label">
-                    Balance
-                </span>
+                <div class="section-header">
 
-                <div class="summary-value balance">
-                    ₹{{ balance|floatformat:2 }}
+                    <div>
+
+                        <h2>
+                            Period Comparison
+                        </h2>
+
+                        <p>
+                            Compare this period with the immediately preceding period.
+                        </p>
+
+                    </div>
+
                 </div>
 
-            </div>
 
-        </div>
-
+                <div class="comparison-grid">
 
 
-        <!-- ================= CATEGORY SUMMARY ================= -->
+                    <div class="comparison-card">
 
-        <div class="table-card">
+                        <div class="comparison-top">
+
+                            <div class="comparison-title">
+                                Income
+                            </div>
+
+                            <span
+                                class="
+                                    change-badge
+                                    {% if income_change > 0 %}
+                                        change-positive
+                                    {% elif income_change < 0 %}
+                                        change-negative
+                                    {% else %}
+                                        change-neutral
+                                    {% endif %}
+                                "
+                            >
+                                {% if income_change > 0 %}↑{% elif income_change < 0 %}↓{% else %}→{% endif %}
+                                {{ income_change|floatformat:1 }}%
+                            </span>
+
+                        </div>
+
+                        <div class="comparison-current">
+                            ₹{{ total_income|floatformat:2 }}
+                        </div>
+
+                        <div class="comparison-previous">
+                            Previous: ₹{{ previous_income|floatformat:2 }}
+                        </div>
+
+                    </div>
 
 
-            <div class="table-header">
+                    <div class="comparison-card">
 
-                <h2>
-                    Category-wise Summary
-                </h2>
+                        <div class="comparison-top">
+
+                            <div class="comparison-title">
+                                Expenses
+                            </div>
+
+                            <span
+                                class="
+                                    change-badge
+                                    {% if expense_change < 0 %}
+                                        change-positive
+                                    {% elif expense_change > 0 %}
+                                        change-negative
+                                    {% else %}
+                                        change-neutral
+                                    {% endif %}
+                                "
+                            >
+                                {% if expense_change > 0 %}↑{% elif expense_change < 0 %}↓{% else %}→{% endif %}
+                                {{ expense_change|floatformat:1 }}%
+                            </span>
+
+                        </div>
+
+                        <div class="comparison-current">
+                            ₹{{ total_expenses|floatformat:2 }}
+                        </div>
+
+                        <div class="comparison-previous">
+                            Previous: ₹{{ previous_expenses|floatformat:2 }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="comparison-card">
+
+                        <div class="comparison-top">
+
+                            <div class="comparison-title">
+                                Net Savings
+                            </div>
+
+                            <span
+                                class="
+                                    change-badge
+                                    {% if balance_change > 0 %}
+                                        change-positive
+                                    {% elif balance_change < 0 %}
+                                        change-negative
+                                    {% else %}
+                                        change-neutral
+                                    {% endif %}
+                                "
+                            >
+                                {% if balance_change > 0 %}↑{% elif balance_change < 0 %}↓{% else %}→{% endif %}
+                                {{ balance_change|floatformat:1 }}%
+                            </span>
+
+                        </div>
+
+                        <div class="comparison-current">
+                            ₹{{ balance|floatformat:2 }}
+                        </div>
+
+                        <div class="comparison-previous">
+                            Previous: ₹{{ previous_balance|floatformat:2 }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 TREND ANALYSIS
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Trend Analysis
+                        </h2>
+
+                        <p>
+                            {% if report_type == 'yearly' %}
+                                Month-by-month financial movement across the year.
+                            {% else %}
+                                Day-by-day financial movement across the month.
+                            {% endif %}
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-card">
+
+                    <div class="chart-card-header">
+
+                        <div>
+
+                            <h3>
+                                Income, Expenses & Savings
+                            </h3>
+
+                            <span>
+                                {% if report_type == 'yearly' %}
+                                    Monthly trend
+                                {% else %}
+                                    Daily trend
+                                {% endif %}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="trendChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 DISTRIBUTION CHARTS
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Financial Distribution
+                        </h2>
+
+                        <p>
+                            See where your money comes from, where it goes, and how it is paid.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="three-column-grid">
+
+
+                    <div class="chart-card">
+
+                        <div class="chart-card-header">
+
+                            <div>
+                                <h3>
+                                    Expense Categories
+                                </h3>
+
+                                <span>
+                                    Share of total expenses
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-container small">
+
+                            <canvas id="expenseCategoryChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-card">
+
+                        <div class="chart-card-header">
+
+                            <div>
+                                <h3>
+                                    Income Sources
+                                </h3>
+
+                                <span>
+                                    Share of total income
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-container small">
+
+                            <canvas id="incomeSourceChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="chart-card">
+
+                        <div class="chart-card-header">
+
+                            <div>
+                                <h3>
+                                    Payment Methods
+                                </h3>
+
+                                <span>
+                                    Combined transaction value
+                                </span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-container small">
+
+                            <canvas id="paymentMethodChart"></canvas>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 TOP HIGHLIGHTS
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Financial Highlights
+                        </h2>
+
+                        <p>
+                            The most significant entries and patterns in this period.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="highlights-grid">
+
+
+                    <div class="highlight-card">
+
+                        <div class="highlight-icon">
+                            🔥
+                        </div>
+
+                        <div class="highlight-label">
+                            Top Expense Category
+                        </div>
+
+                        <div class="highlight-value">
+                            {% if top_expense_category %}
+                                {{ top_expense_category.name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+
+                        <div class="highlight-sub">
+                            {% if top_expense_category %}
+                                ₹{{ top_expense_category.total|floatformat:2 }}
+                                ·
+                                {{ top_expense_category.percentage|floatformat:1 }}%
+                            {% else %}
+                                No expense data
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+
+                    <div class="highlight-card">
+
+                        <div class="highlight-icon">
+                            💼
+                        </div>
+
+                        <div class="highlight-label">
+                            Top Income Source
+                        </div>
+
+                        <div class="highlight-value">
+                            {% if top_income_source %}
+                                {{ top_income_source.name }}
+                            {% else %}
+                                —
+                            {% endif %}
+                        </div>
+
+                        <div class="highlight-sub">
+                            {% if top_income_source %}
+                                ₹{{ top_income_source.total|floatformat:2 }}
+                                ·
+                                {{ top_income_source.percentage|floatformat:1 }}%
+                            {% else %}
+                                No income data
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+
+                    <div class="highlight-card">
+
+                        <div class="highlight-icon">
+                            💳
+                        </div>
+
+                        <div class="highlight-label">
+                            Most Used Payment
+                        </div>
+
+                        <div class="highlight-value">
+                            {{ most_used_payment_method }}
+                        </div>
+
+                        <div class="highlight-sub">
+                            Based on transaction count/value ranking
+                        </div>
+
+                    </div>
+
+
+                    <div class="highlight-card">
+
+                        <div class="highlight-icon">
+                            🧾
+                        </div>
+
+                        <div class="highlight-label">
+                            Avg Expense Transaction
+                        </div>
+
+                        <div class="highlight-value">
+                            ₹{{ average_expense_transaction|floatformat:2 }}
+                        </div>
+
+                        <div class="highlight-sub">
+                            Average across {{ expense_transaction_count }} expense transaction{{ expense_transaction_count|pluralize }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 EXPENSE + INCOME TABLES
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Detailed Breakdown
+                        </h2>
+
+                        <p>
+                            Ranked category and income-source analysis.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="analysis-grid">
+
+
+                    <!-- EXPENSE TABLE -->
+
+                    <div class="table-card">
+
+                        <div class="table-card-header">
+
+                            <h3>
+                                Expense Category Analysis
+                            </h3>
+
+                            <p>
+                                Ranked by total spending.
+                            </p>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            {% if expense_category_summary %}
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Category
+                                            </th>
+
+                                            <th>
+                                                Transactions
+                                            </th>
+
+                                            <th>
+                                                Share
+                                            </th>
+
+                                            <th>
+                                                Amount
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in expense_category_summary %}
+
+                                            <tr>
+
+                                                <td class="strong">
+                                                    {{ item.name }}
+                                                </td>
+
+                                                <td>
+                                                    {{ item.count }}
+                                                </td>
+
+                                                <td class="percentage">
+                                                    {{ item.percentage|floatformat:1 }}%
+                                                </td>
+
+                                                <td class="amount-red">
+                                                    ₹{{ item.total|floatformat:2 }}
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            {% else %}
+
+                                <div class="empty-state">
+                                    No expense categories found.
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- INCOME TABLE -->
+
+                    <div class="table-card">
+
+                        <div class="table-card-header">
+
+                            <h3>
+                                Income Source Analysis
+                            </h3>
+
+                            <p>
+                                Ranked by total income received.
+                            </p>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            {% if income_source_summary %}
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Source
+                                            </th>
+
+                                            <th>
+                                                Transactions
+                                            </th>
+
+                                            <th>
+                                                Share
+                                            </th>
+
+                                            <th>
+                                                Amount
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in income_source_summary %}
+
+                                            <tr>
+
+                                                <td class="strong">
+                                                    {{ item.name }}
+                                                </td>
+
+                                                <td>
+                                                    {{ item.count }}
+                                                </td>
+
+                                                <td class="percentage">
+                                                    {{ item.percentage|floatformat:1 }}%
+                                                </td>
+
+                                                <td class="amount-green">
+                                                    ₹{{ item.total|floatformat:2 }}
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            {% else %}
+
+                                <div class="empty-state">
+                                    No income sources found.
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 PAYMENT + BUDGET ANALYSIS
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Control & Spending Analysis
+                        </h2>
+
+                        <p>
+                            Payment behavior and actual spending against configured budgets.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="analysis-grid">
+
+
+                    <!-- PAYMENT METHODS -->
+
+                    <div class="table-card">
+
+                        <div class="table-card-header">
+
+                            <h3>
+                                Payment Method Analysis
+                            </h3>
+
+                            <p>
+                                Value and transaction-count distribution.
+                            </p>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            {% if payment_summary %}
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Method
+                                            </th>
+
+                                            <th>
+                                                Transactions
+                                            </th>
+
+                                            <th>
+                                                Share
+                                            </th>
+
+                                            <th>
+                                                Value
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in payment_summary %}
+
+                                            <tr>
+
+                                                <td class="strong">
+                                                    {{ item.method }}
+                                                </td>
+
+                                                <td>
+                                                    {{ item.count }}
+                                                </td>
+
+                                                <td class="percentage">
+                                                    {{ item.percentage|floatformat:1 }}%
+                                                </td>
+
+                                                <td class="strong">
+                                                    ₹{{ item.amount|floatformat:2 }}
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+                            {% else %}
+
+                                <div class="empty-state">
+                                    No payment data found.
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- BUDGET ANALYSIS -->
+
+                    <div class="table-card">
+
+                        <div class="table-card-header">
+
+                            <h3>
+                                Budget Performance
+                            </h3>
+
+                            <p>
+                                {% if budget_analysis %}
+                                    {{ exceeded_budget_count }} exceeded ·
+                                    {{ near_limit_budget_count }} near limit
+                                {% else %}
+                                    No active budgets in this period.
+                                {% endif %}
+                            </p>
+
+                        </div>
+
+
+                        <div class="table-wrapper">
+
+                            {% if budget_analysis %}
+
+                                <table>
+
+                                    <thead>
+
+                                        <tr>
+
+                                            <th>
+                                                Category
+                                            </th>
+
+                                            <th>
+                                                Utilization
+                                            </th>
+
+                                            <th>
+                                                Remaining
+                                            </th>
+
+                                            <th>
+                                                Status
+                                            </th>
+
+                                        </tr>
+
+                                    </thead>
+
+
+                                    <tbody>
+
+                                        {% for item in budget_analysis %}
+
+                                            <tr>
+
+                                                <td class="strong">
+                                                    {{ item.category }}
+                                                </td>
+
+
+                                                <td class="progress-cell">
+
+                                                    <div class="progress-meta">
+
+                                                        <span>
+                                                            {{ item.utilization|floatformat:1 }}%
+                                                        </span>
+
+                                                        <span>
+                                                            ₹{{ item.spent|floatformat:0 }}
+                                                            /
+                                                            ₹{{ item.limit|floatformat:0 }}
+                                                        </span>
+
+                                                    </div>
+
+
+                                                    <div class="progress-track">
+
+                                                        {% if item.utilization >= 100 %}
+
+                                                            <div
+                                                                class="progress-bar danger"
+                                                                style="
+                                                                    width:
+                                                                    {% if item.utilization > 100 %}
+                                                                        100
+                                                                    {% else %}
+                                                                        {{ item.utilization }}
+                                                                    {% endif %}
+                                                                    %;
+                                                                "
+                                                            ></div>
+
+                                                        {% elif item.utilization >= 80 %}
+
+                                                            <div
+                                                                class="progress-bar warning"
+                                                                style="
+                                                                    width:
+                                                                    {{ item.utilization }}%;
+                                                                "
+                                                            ></div>
+
+                                                        {% else %}
+
+                                                            <div
+                                                                class="progress-bar"
+                                                                style="
+                                                                    width:
+                                                                    {{ item.utilization }}%;
+                                                                "
+                                                            ></div>
+
+                                                        {% endif %}
+
+                                                    </div>
+
+                                                </td>
+
+
+                                                <td>
+
+                                                    {% if item.remaining < 0 %}
+
+                                                        <span class="amount-red">
+                                                            -₹{{ item.remaining|stringformat:"s"|slice:"1:" }}
+                                                        </span>
+
+                                                    {% else %}
+
+                                                        ₹{{ item.remaining|floatformat:2 }}
+
+                                                    {% endif %}
+
+                                                </td>
+
+
+                                                <td>
+
+                                                    {% if item.status == 'Exceeded' %}
+
+                                                        <span class="status-badge status-danger">
+                                                            Exceeded
+                                                        </span>
+
+                                                    {% elif item.status == 'Near Limit' %}
+
+                                                        <span class="status-badge status-warning">
+                                                            Near Limit
+                                                        </span>
+
+                                                    {% else %}
+
+                                                        <span class="status-badge status-ok">
+                                                            On Track
+                                                        </span>
+
+                                                    {% endif %}
+
+                                                </td>
+
+                                            </tr>
+
+                                        {% endfor %}
+
+                                    </tbody>
+
+                                </table>
+
+
+                                <div
+                                    style="
+                                        padding:
+                                            12px 14px;
+                                        border-top:
+                                            1px solid var(--border);
+                                        color:
+                                            var(--text-secondary);
+                                        font-size:
+                                            10px;
+                                    "
+                                >
+                                    Total budget used:
+                                    <strong>
+                                        ₹{{ total_budget_spent|floatformat:2 }}
+                                    </strong>
+                                    /
+                                    ₹{{ total_budget_limit|floatformat:2 }}
+
+                                    ·
+
+                                    Overall utilization:
+                                    <strong>
+                                        {{ overall_budget_utilization|floatformat:1 }}%
+                                    </strong>
+                                </div>
+
+                            {% else %}
+
+                                <div class="empty-state">
+                                    No budget data available for this period.
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- =================================================
+                 HIGHEST TRANSACTIONS
+                 ================================================= -->
+
+            <section class="section">
+
+                <div class="section-header">
+
+                    <div>
+
+                        <h2>
+                            Largest Transactions
+                        </h2>
+
+                        <p>
+                            The highest-value income and expense entries recorded in this period.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="comparison-grid">
+
+
+                    <div class="comparison-card">
+
+                        <div class="comparison-title">
+                            Highest Expense
+                        </div>
+
+                        {% if highest_expense %}
+
+                            <div
+                                class="comparison-current"
+                                style="margin-top: 9px; color: var(--red);"
+                            >
+                                ₹{{ highest_expense.amount|floatformat:2 }}
+                            </div>
+
+                            <div class="comparison-previous">
+
+                                {{ highest_expense.category.name }}
+
+                                {% if highest_expense.description %}
+                                    · {{ highest_expense.description }}
+                                {% endif %}
+
+                                · {{ highest_expense.date|date:"d M Y" }}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="comparison-current">
+                                —
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="comparison-card">
+
+                        <div class="comparison-title">
+                            Highest Income
+                        </div>
+
+                        {% if highest_income %}
+
+                            <div
+                                class="comparison-current"
+                                style="margin-top: 9px; color: var(--green);"
+                            >
+                                ₹{{ highest_income.amount|floatformat:2 }}
+                            </div>
+
+                            <div class="comparison-previous">
+
+                                {{ highest_income.category.name }}
+
+                                {% if highest_income.description %}
+                                    · {{ highest_income.description }}
+                                {% endif %}
+
+                                · {{ highest_income.date|date:"d M Y" }}
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="comparison-current">
+                                —
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="comparison-card">
+
+                        <div class="comparison-title">
+                            Budget Utilization
+                        </div>
+
+                        <div
+                            class="comparison-current"
+                            style="margin-top: 9px; color: var(--primary-dark);"
+                        >
+                            {{ overall_budget_utilization|floatformat:1 }}%
+                        </div>
+
+                        <div class="comparison-previous">
+                            ₹{{ total_budget_spent|floatformat:2 }}
+                            used from
+                            ₹{{ total_budget_limit|floatformat:2 }}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        {% else %}
+
+
+            <!-- =================================================
+                 EMPTY PERIOD
+                 ================================================= -->
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    📊
+                </div>
+
+                <h3>
+                    No transactions found for this period
+                </h3>
 
                 <p>
-                    Breakdown of income and expenses by category.
+                    Try another report period or add transactions to generate deeper analytics.
                 </p>
 
             </div>
 
+        {% endif %}
 
 
-            {% if category_summary %}
+        <div
+            style="
+                margin-top:
+                    24px;
+                text-align:
+                    center;
+            "
+        >
 
-                <div class="table-wrapper">
-
-                    <table>
-
-                        <thead>
-
-                            <tr>
-
-                                <th>
-                                    Category
-                                </th>
-
-                                <th>
-                                    Type
-                                </th>
-
-                                <th>
-                                    Total
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            {% for item in category_summary %}
-
-                                <tr>
-
-                                    <td class="category">
-                                        {{ item.category__name }}
-                                    </td>
-
-
-                                    <td>
-
-                                        {% if item.category__type == 'income' %}
-
-                                            <span
-                                                class="type-badge income-badge"
-                                            >
-                                                Income
-                                            </span>
-
-                                        {% else %}
-
-                                            <span
-                                                class="type-badge expense-badge"
-                                            >
-                                                Expense
-                                            </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-
-                                    <td class="total">
-                                        ₹{{ item.total|floatformat:2 }}
-                                    </td>
-
-                                </tr>
-
-                            {% endfor %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-
-            {% else %}
-
-                <div class="empty-state">
-
-                    <div class="empty-icon">
-                        📊
-                    </div>
-
-                    <h3>
-                        No transactions found
-                    </h3>
-
-                    <p>
-                        There are no transactions for this reporting period.
-                    </p>
-
-                </div>
-
-            {% endif %}
-
-        </div>
-
-
-
-        <!-- ================= FOOTER ================= -->
-
-        <div class="footer">
-
-            <a href="{% url 'dashboard' %}">
+            <a
+                href="{% url 'dashboard' %}"
+                style="
+                    color:
+                        var(--text-secondary);
+                    font-size:
+                        12px;
+                    font-weight:
+                        700;
+                "
+            >
                 ← Back to Dashboard
             </a>
 
         </div>
 
-
     </div>
 
 </div>
 
+
+<!-- =========================================================
+     CHART DATA
+     ========================================================= -->
+
+{{ trend_labels|json_script:"report-trend-labels" }}
+{{ trend_income|json_script:"report-trend-income" }}
+{{ trend_expenses|json_script:"report-trend-expenses" }}
+{{ trend_savings|json_script:"report-trend-savings" }}
+
+
+<script>
+
+    const trendLabels = JSON.parse(
+        document.getElementById(
+            "report-trend-labels"
+        ).textContent
+    );
+
+
+    const trendIncome = JSON.parse(
+        document.getElementById(
+            "report-trend-income"
+        ).textContent
+    );
+
+
+    const trendExpenses = JSON.parse(
+        document.getElementById(
+            "report-trend-expenses"
+        ).textContent
+    );
+
+
+    const trendSavings = JSON.parse(
+        document.getElementById(
+            "report-trend-savings"
+        ).textContent
+    );
+
+
+    const chartGridColor =
+        "rgba(148, 163, 184, 0.16)";
+
+
+    const chartTextColor =
+        "#64748b";
+
+
+    /* =====================================================
+       TREND CHART
+       ===================================================== */
+
+    new Chart(
+        document.getElementById("trendChart"),
+        {
+            type: "line",
+
+            data: {
+
+                labels: trendLabels,
+
+                datasets: [
+
+                    {
+                        label: "Income",
+
+                        data: trendIncome,
+
+                        borderColor: "#059669",
+
+                        backgroundColor:
+                            "rgba(5, 150, 105, 0.08)",
+
+                        fill: true,
+
+                        tension: 0.35,
+
+                        borderWidth: 2,
+
+                        pointRadius: 2
+                    },
+
+                    {
+                        label: "Expenses",
+
+                        data: trendExpenses,
+
+                        borderColor: "#dc2626",
+
+                        backgroundColor:
+                            "rgba(220, 38, 38, 0.06)",
+
+                        fill: true,
+
+                        tension: 0.35,
+
+                        borderWidth: 2,
+
+                        pointRadius: 2
+                    },
+
+                    {
+                        label: "Savings",
+
+                        data: trendSavings,
+
+                        borderColor: "#6366f1",
+
+                        backgroundColor:
+                            "rgba(99, 102, 241, 0.04)",
+
+                        fill: false,
+
+                        tension: 0.35,
+
+                        borderWidth: 2,
+
+                        pointRadius: 2
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    mode: "index",
+                    intersect: false
+                },
+
+                plugins: {
+
+                    legend: {
+                        position: "top",
+                        labels: {
+                            color: chartTextColor,
+                            usePointStyle: true,
+                            padding: 16
+                        }
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+                                    context.dataset.label
+                                    + ": ₹"
+                                    + Number(
+                                        context.parsed.y
+                                    ).toLocaleString(
+                                        "en-IN",
+                                        {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }
+                                    )
+                                );
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+                            color: chartTextColor,
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 12
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        grid: {
+                            color: chartGridColor
+                        },
+
+                        ticks: {
+
+                            color: chartTextColor,
+
+                            callback: function(value) {
+
+                                return "₹"
+                                    + Number(value)
+                                        .toLocaleString(
+                                            "en-IN"
+                                        );
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       EXPENSE CATEGORY DOUGHNUT
+       ===================================================== */
+
+    new Chart(
+        document.getElementById(
+            "expenseCategoryChart"
+        ),
+        {
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    {% for item in expense_category_summary %}
+                        "{{ item.name|escapejs }}",
+                    {% endfor %}
+                ],
+
+                datasets: [
+
+                    {
+                        data: [
+                            {% for item in expense_category_summary %}
+                                {{ item.total|floatformat:2 }},
+                            {% endfor %}
+                        ],
+
+                        backgroundColor: [
+                            "#6366f1",
+                            "#059669",
+                            "#dc2626",
+                            "#2563eb",
+                            "#d97706",
+                            "#7c3aed",
+                            "#0891b2",
+                            "#db2777",
+                            "#65a30d",
+                            "#ea580c"
+                        ],
+
+                        borderWidth: 2,
+
+                        borderColor: "#ffffff"
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "64%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            color: chartTextColor,
+
+                            usePointStyle: true,
+
+                            padding: 10,
+
+                            font: {
+                                size: 10
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       INCOME SOURCE DOUGHNUT
+       ===================================================== */
+
+    new Chart(
+        document.getElementById(
+            "incomeSourceChart"
+        ),
+        {
+            type: "doughnut",
+
+            data: {
+
+                labels: [
+                    {% for item in income_source_summary %}
+                        "{{ item.name|escapejs }}",
+                    {% endfor %}
+                ],
+
+                datasets: [
+
+                    {
+                        data: [
+                            {% for item in income_source_summary %}
+                                {{ item.total|floatformat:2 }},
+                            {% endfor %}
+                        ],
+
+                        backgroundColor: [
+                            "#059669",
+                            "#2563eb",
+                            "#6366f1",
+                            "#d97706",
+                            "#7c3aed",
+                            "#0891b2",
+                            "#db2777",
+                            "#65a30d",
+                            "#ea580c",
+                            "#0f766e"
+                        ],
+
+                        borderWidth: 2,
+
+                        borderColor: "#ffffff"
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "64%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            color: chartTextColor,
+
+                            usePointStyle: true,
+
+                            padding: 10,
+
+                            font: {
+                                size: 10
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       PAYMENT METHOD BAR
+       ===================================================== */
+
+    new Chart(
+        document.getElementById(
+            "paymentMethodChart"
+        ),
+        {
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    {% for item in payment_summary %}
+                        "{{ item.method|escapejs }}",
+                    {% endfor %}
+                ],
+
+                datasets: [
+
+                    {
+                        label: "Value",
+
+                        data: [
+                            {% for item in payment_summary %}
+                                {{ item.amount|floatformat:2 }},
+                            {% endfor %}
+                        ],
+
+                        backgroundColor: [
+                            "#6366f1",
+                            "#059669",
+                            "#2563eb"
+                        ],
+
+                        borderRadius: 8,
+
+                        borderSkipped: false
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+
+                        grid: {
+                            display: false
+                        },
+
+                        ticks: {
+                            color: chartTextColor
+                        }
+
+                    },
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        grid: {
+                            color: chartGridColor
+                        },
+
+                        ticks: {
+
+                            color: chartTextColor,
+
+                            callback: function(value) {
+
+                                return "₹"
+                                    + Number(value)
+                                        .toLocaleString(
+                                            "en-IN"
+                                        );
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+</script>
+
+
+<script>
+
+    /* =========================================================
+       REPORT CHART THEME BRIDGE
+       Keeps Chart.js readable when the global theme changes.
+       ========================================================= */
+
+    function getReportChartTextColor() {
+
+        return document.documentElement.getAttribute(
+            "data-theme"
+        ) === "dark"
+            ? "#cbd5e1"
+            : "#64748b";
+    }
+
+
+    function getReportChartGridColor() {
+
+        return document.documentElement.getAttribute(
+            "data-theme"
+        ) === "dark"
+            ? "rgba(148, 163, 184, 0.14)"
+            : "rgba(148, 163, 184, 0.16)";
+    }
+
+
+    function updateReportChartsTheme() {
+
+        if (typeof Chart === "undefined") {
+            return;
+        }
+
+        const textColor =
+            getReportChartTextColor();
+
+        const gridColor =
+            getReportChartGridColor();
+
+        Object.values(Chart.instances || {}).forEach(
+            function (chart) {
+
+                if (!chart || !chart.options) {
+                    return;
+                }
+
+                /* Legend text */
+                if (
+                    chart.options.plugins &&
+                    chart.options.plugins.legend &&
+                    chart.options.plugins.legend.labels
+                ) {
+                    chart.options.plugins.legend.labels.color =
+                        textColor;
+                }
+
+
+                /* Axes */
+                if (chart.options.scales) {
+
+                    Object.values(
+                        chart.options.scales
+                    ).forEach(
+                        function (scale) {
+
+                            if (scale.ticks) {
+                                scale.ticks.color =
+                                    textColor;
+                            }
+
+                            if (scale.grid) {
+                                scale.grid.color =
+                                    gridColor;
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* Doughnut border */
+                if (
+                    chart.data &&
+                    chart.data.datasets
+                ) {
+
+                    chart.data.datasets.forEach(
+                        function (dataset) {
+
+                            if (
+                                dataset.type === "doughnut" ||
+                                chart.config.type === "doughnut"
+                            ) {
+                                dataset.borderColor =
+                                    document.documentElement
+                                        .getAttribute("data-theme") === "dark"
+                                        ? "#151b2d"
+                                        : "#ffffff";
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                chart.update("none");
+
+            }
+        );
+
+    }
+
+
+    /* Observe theme changes made by theme.js. */
+    const reportThemeObserver =
+        new MutationObserver(
+            function (mutations) {
+
+                mutations.forEach(
+                    function (mutation) {
+
+                        if (
+                            mutation.attributeName ===
+                            "data-theme"
+                        ) {
+
+                            updateReportChartsTheme();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    reportThemeObserver.observe(
+        document.documentElement,
+        {
+            attributes: true,
+            attributeFilter: ["data-theme"]
+        }
+    );
+
+
+    /* Also apply the correct state after initial page load. */
+    setTimeout(
+        updateReportChartsTheme,
+        0
+    );
+
+</script>
+
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 </body>
 

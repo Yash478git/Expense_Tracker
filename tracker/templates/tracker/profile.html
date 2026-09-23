@@ -19,6 +19,12 @@
         href="{% static 'tracker/css/style.css' %}"
     >
 
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
     <!-- Expense Tracker Favicon -->
     <link
         rel="icon"
@@ -544,6 +550,202 @@
            RESPONSIVE
            ===================================================== */
 
+
+        /* =====================================================
+           DARK MODE
+           ===================================================== */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                #0b1020;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .page-title h1 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .page-title p {
+            color: #9da7ba;
+        }
+
+
+        html[data-theme="dark"] .back-btn {
+            background: #151b2d;
+
+            border-color: #2b354d;
+
+            color: #cbd5e1;
+
+            box-shadow:
+                0 6px 18px
+                rgba(0, 0, 0, 0.18);
+        }
+
+
+        html[data-theme="dark"] .back-btn:hover {
+            background: #1a2235;
+
+            border-color: #6366f1;
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .profile-card,
+        html[data-theme="dark"] .form-card {
+            background:
+                linear-gradient(
+                    180deg,
+                    #151b2d 0%,
+                    #121827 100%
+                );
+
+            border-color: #2b354d;
+
+            box-shadow:
+                0 12px 35px
+                rgba(0, 0, 0, 0.22);
+        }
+
+
+        html[data-theme="dark"] .profile-card h2,
+        html[data-theme="dark"] .form-header h2 {
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .profile-email,
+        html[data-theme="dark"] .form-header p {
+            color: #8f9ab0;
+        }
+
+
+        html[data-theme="dark"] .profile-divider,
+        html[data-theme="dark"] .form-header {
+            border-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .info-label {
+            color: #7f8aa0;
+        }
+
+
+        html[data-theme="dark"] .info-value {
+            color: #dbe4f0;
+        }
+
+
+        html[data-theme="dark"] .form-icon {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .profile-form label {
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .profile-form input {
+            background: #0f1728;
+
+            border-color: #34405a;
+
+            color: #f8fafc;
+        }
+
+
+        html[data-theme="dark"] .profile-form input::placeholder {
+            color: #778198;
+        }
+
+
+        html[data-theme="dark"] .profile-form input:focus {
+            background: #121a2d;
+
+            border-color: #718cf5;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(113, 140, 245, 0.16);
+        }
+
+
+        html[data-theme="dark"] .errorlist {
+            color: #ff8d8d;
+        }
+
+
+        html[data-theme="dark"] .info-box {
+            background:
+                rgba(37, 99, 235, 0.12);
+
+            border-color:
+                rgba(96, 165, 250, 0.25);
+
+            color: #93c5fd;
+        }
+
+
+        html[data-theme="dark"] .info-icon {
+            background:
+                rgba(96, 165, 250, 0.15);
+        }
+
+
+        html[data-theme="dark"] .form-actions {
+            border-top-color: #2b354d;
+        }
+
+
+        html[data-theme="dark"] .cancel-btn {
+            background: #1b2338;
+
+            border-color: #34405a;
+
+            color: #cbd5e1;
+        }
+
+
+        html[data-theme="dark"] .cancel-btn:hover {
+            background: #252e43;
+
+            border-color: #465673;
+
+            color: #e5e7eb;
+        }
+
+
+        html[data-theme="dark"] .password-btn {
+            background:
+                rgba(99, 102, 241, 0.15);
+
+            border-color:
+                rgba(129, 140, 248, 0.30);
+
+            color: #a5b4fc;
+        }
+
+
+        html[data-theme="dark"] .password-btn:hover {
+            background:
+                rgba(99, 102, 241, 0.24);
+
+            border-color: #818cf8;
+        }
+
         @media (max-width: 800px) {
 
             .page {
@@ -870,6 +1072,10 @@
 
 </div>
 
+
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 </body>
 

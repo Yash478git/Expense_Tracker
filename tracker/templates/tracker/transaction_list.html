@@ -31,6 +31,12 @@
         href="{% static 'tracker/favicon.png' %}?v=3"
     >
 
+    <!-- Global Theme -->
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
     <style>
 
         body {
@@ -486,7 +492,138 @@
         }
 
 
-        /* ================= RESPONSIVE ================= */
+        /* ================= DARK MODE ================= */
+
+        html[data-theme="dark"] body {
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(77, 91, 160, 0.10),
+                    transparent 30%
+                ),
+                #0b1020;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .page-title p,
+        html[data-theme="dark"] .filter-header span,
+        html[data-theme="dark"] .description,
+        html[data-theme="dark"] .back-link {
+            color: #8f9ab0;
+        }
+
+        html[data-theme="dark"] .top-btn:not(.primary) {
+            background: #151b2d;
+            border-color: #2b354d;
+            color: #dbe3f0;
+        }
+
+        html[data-theme="dark"] .top-btn:not(.primary):hover {
+            border-color: #6366f1;
+            color: #a5b4fc;
+        }
+
+        html[data-theme="dark"] .filter-card,
+        html[data-theme="dark"] .table-card {
+            background:
+                linear-gradient(180deg, #151b2d 0%, #121827 100%);
+            border-color: #2b354d;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        html[data-theme="dark"] .filter-header,
+        html[data-theme="dark"] .table-header {
+            border-color: #293349;
+        }
+
+        html[data-theme="dark"] .filter-group label {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .filter-group input,
+        html[data-theme="dark"] .filter-group select {
+            background: #0f1728;
+            border-color: #34405a;
+            color: #e5e7eb;
+        }
+
+        html[data-theme="dark"] .filter-group input::placeholder {
+            color: #778198;
+        }
+
+        html[data-theme="dark"] .filter-group input:focus,
+        html[data-theme="dark"] .filter-group select:focus {
+            background: #121a2d;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
+        }
+
+        html[data-theme="dark"] th {
+            background: #1b2338;
+            color: #aeb9cb;
+            border-bottom-color: #2b354d;
+        }
+
+        html[data-theme="dark"] td {
+            color: #d7deea;
+            border-bottom-color: #293349;
+        }
+
+        html[data-theme="dark"] tbody tr:hover {
+            background: #0f1728;
+        }
+
+        html[data-theme="dark"] .transaction-count {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        html[data-theme="dark"] .category-name {
+            background: #20293c;
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .edit-btn {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+        }
+
+        html[data-theme="dark"] .edit-btn:hover {
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        html[data-theme="dark"] .delete-btn {
+            background: rgba(239, 68, 68, 0.12);
+            color: #fca5a5;
+        }
+
+        html[data-theme="dark"] .delete-btn:hover {
+            background: rgba(239, 68, 68, 0.20);
+        }
+
+        html[data-theme="dark"] .empty-icon {
+            background: rgba(99, 102, 241, 0.15);
+        }
+
+        html[data-theme="dark"] .empty-state p {
+            color: #8f9ab0;
+        }
+
+        html[data-theme="dark"] .back-link:hover {
+            color: #a5b4fc;
+        }
+
+        html[data-theme="dark"] .income-badge {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        html[data-theme="dark"] .expense-badge {
+            background: rgba(239, 68, 68, 0.15);
+            color: #fca5a5;
+        }
+
+                /* ================= RESPONSIVE ================= */
 
         @media (max-width: 1100px) {
 
@@ -1092,6 +1229,9 @@
 
 </div>
 
+
+<!-- Global Theme Script -->
+<script src="{% static 'tracker/theme.js' %}"></script>
 
 </body>
 
