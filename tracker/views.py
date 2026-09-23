@@ -43,7 +43,14 @@ from reportlab.platypus import (
 )
 
 from openpyxl import Workbook
-from openpyxl.styles import Font
+from openpyxl.styles import (
+    Font,
+    PatternFill,
+    Border,
+    Side,
+    Alignment,
+)
+from openpyxl.utils import get_column_letter
 
 def register(request):
     if request.method == 'POST':
@@ -1618,12 +1625,16 @@ def export_report_excel(request):
             month=1,
             day=1
         )
+
         end_date = today.replace(
             month=12,
             day=31
         )
+
     else:
-        start_date = today.replace(day=1)
+        start_date = today.replace(
+            day=1
+        )
 
         if today.month == 12:
             next_month = today.replace(
@@ -1631,6 +1642,7 @@ def export_report_excel(request):
                 month=1,
                 day=1
             )
+
         else:
             next_month = today.replace(
                 month=today.month + 1,
@@ -1639,10 +1651,16 @@ def export_report_excel(request):
 
         end_date = next_month - timedelta(days=1)
 
+
+    # =========================================================
+    # FETCH REPORT DATA
+    # =========================================================
+
     transactions = request.user.transactions.filter(
         date__gte=start_date,
         date__lte=end_date
     )
+
 
     total_income = transactions.filter(
         type='income'
@@ -1650,13 +1668,19 @@ def export_report_excel(request):
         total=Sum('amount')
     )['total'] or 0
 
+
     total_expenses = transactions.filter(
         type='expense'
     ).aggregate(
         total=Sum('amount')
     )['total'] or 0
 
+
     balance = total_income - total_expenses
+
+
+    transaction_count = transactions.count()
+
 
     category_summary = transactions.values(
         'category__name',
@@ -1665,63 +1689,595 @@ def export_report_excel(request):
         total=Sum('amount')
     ).order_by('-total')
 
+
+    # =========================================================
+    # WORKBOOK
+    # =========================================================
+
     workbook = Workbook()
+
     worksheet = workbook.active
+
     worksheet.title = 'Financial Report'
 
-    worksheet['A1'] = (
-        f'Expense Tracker - {report_type.title()} Report'
+    worksheet.sheet_view.showGridLines = False
+
+
+    # =========================================================
+    # COLORS
+    # =========================================================
+
+    INDIGO = '4F46E5'
+    INDIGO_DARK = '3730A3'
+    INDIGO_LIGHT = 'EEF2FF'
+
+    GREEN = '059669'
+    GREEN_LIGHT = 'ECFDF5'
+
+    RED = 'DC2626'
+    RED_LIGHT = 'FEF2F2'
+
+    TEXT_DARK = '111827'
+    TEXT_MUTED = '6B7280'
+
+    BORDER_COLOR = 'E5E7EB'
+    ROW_LIGHT = 'F9FAFB'
+
+    WHITE = 'FFFFFF'
+
+
+    # =========================================================
+    # REUSABLE STYLES
+    # =========================================================
+
+    thin_side = Side(
+        style='thin',
+        color=BORDER_COLOR
     )
-    worksheet['A1'].font = Font(
+
+
+    medium_side = Side(
+        style='medium',
+        color=INDIGO
+    )
+
+
+    thin_border = Border(
+        left=thin_side,
+        right=thin_side,
+        top=thin_side,
+        bottom=thin_side
+    )
+
+
+    # =========================================================
+    # PAGE SETTINGS
+    # =========================================================
+
+    worksheet.freeze_panes = 'A10'
+
+    worksheet.sheet_properties.pageSetUpPr.fitToPage = True
+
+    worksheet.page_setup.fitToWidth = 1
+
+    worksheet.page_setup.fitToHeight = 0
+
+    worksheet.page_margins.left = 0.3
+    worksheet.page_margins.right = 0.3
+    worksheet.page_margins.top = 0.5
+    worksheet.page_margins.bottom = 0.5
+
+
+    # =========================================================
+    # HEADER
+    # =========================================================
+
+    worksheet.merge_cells('A1:C2')
+
+    title_cell = worksheet['A1']
+
+    title_cell.value = (
+        f'EXPENSE TRACKER\n'
+        f'{report_type.title()} Financial Report'
+    )
+
+    title_cell.font = Font(
+        name='Calibri',
+        size=18,
         bold=True,
-        size=16
+        color=WHITE
     )
 
-    worksheet['A3'] = 'Period'
-    worksheet['B3'] = f'{start_date} to {end_date}'
+    title_cell.fill = PatternFill(
+        'solid',
+        fgColor=INDIGO
+    )
 
-    worksheet['A4'] = 'Total Income'
-    worksheet['B4'] = float(total_income)
+    title_cell.alignment = Alignment(
+        horizontal='left',
+        vertical='center',
+        wrap_text=True
+    )
 
-    worksheet['A5'] = 'Total Expenses'
-    worksheet['B5'] = float(total_expenses)
 
-    worksheet['A6'] = 'Balance'
-    worksheet['B6'] = float(balance)
+    for row in worksheet['A1:C2']:
 
-    worksheet['A8'] = 'Category'
-    worksheet['B8'] = 'Type'
-    worksheet['C8'] = 'Total'
+        for cell in row:
 
-    for cell in worksheet[8]:
-        cell.font = Font(bold=True)
+            cell.fill = PatternFill(
+                'solid',
+                fgColor=INDIGO
+            )
 
-    row = 9
+
+    worksheet.row_dimensions[1].height = 28
+    worksheet.row_dimensions[2].height = 28
+
+
+    # =========================================================
+    # REPORT INFORMATION
+    # =========================================================
+
+    worksheet['A4'] = 'Report Information'
+
+    worksheet['A4'].font = Font(
+        bold=True,
+        size=13,
+        color=INDIGO_DARK
+    )
+
+
+    worksheet['A5'] = 'Prepared For'
+
+    worksheet['B5'] = (
+        request.user.get_full_name().strip()
+        or request.user.username
+    )
+
+
+    worksheet['A6'] = 'Period'
+
+    worksheet['B6'] = (
+        f'{start_date.strftime("%d %b %Y")} '
+        f'to '
+        f'{end_date.strftime("%d %b %Y")}'
+    )
+
+
+    worksheet['A7'] = 'Generated'
+
+    worksheet['B7'] = today.strftime(
+        '%d %b %Y'
+    )
+
+
+    worksheet['A8'] = 'Transactions'
+
+    worksheet['B8'] = transaction_count
+
+
+    for row in range(5, 9):
+
+        worksheet[f'A{row}'].font = Font(
+            bold=True,
+            color=TEXT_DARK
+        )
+
+        worksheet[f'B{row}'].font = Font(
+            color=TEXT_MUTED
+        )
+
+        worksheet[f'A{row}'].fill = PatternFill(
+            'solid',
+            fgColor=INDIGO_LIGHT
+        )
+
+        worksheet[f'B{row}'].fill = PatternFill(
+            'solid',
+            fgColor=WHITE
+        )
+
+        worksheet[f'A{row}'].border = thin_border
+        worksheet[f'B{row}'].border = thin_border
+
+
+    # =========================================================
+    # FINANCIAL SUMMARY
+    # =========================================================
+
+    worksheet['A10'] = 'Financial Overview'
+
+    worksheet['A10'].font = Font(
+        bold=True,
+        size=13,
+        color=INDIGO_DARK
+    )
+
+
+    summary_headers = [
+        'Total Income',
+        'Total Expenses',
+        'Current Balance'
+    ]
+
+
+    summary_values = [
+        float(total_income),
+        float(total_expenses),
+        float(balance)
+    ]
+
+
+    for column, (header, value) in enumerate(
+        zip(summary_headers, summary_values),
+        start=1
+    ):
+
+        header_cell = worksheet.cell(
+            row=11,
+            column=column,
+            value=header
+        )
+
+        value_cell = worksheet.cell(
+            row=12,
+            column=column,
+            value=value
+        )
+
+
+        header_cell.font = Font(
+            bold=True,
+            size=10,
+            color=WHITE
+        )
+
+        header_cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+
+        value_cell.font = Font(
+            bold=True,
+            size=15
+        )
+
+        value_cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+
+
+        header_cell.border = thin_border
+        value_cell.border = thin_border
+
+
+        if column == 1:
+
+            header_cell.fill = PatternFill(
+                'solid',
+                fgColor=GREEN
+            )
+
+            value_cell.fill = PatternFill(
+                'solid',
+                fgColor=GREEN_LIGHT
+            )
+
+            value_cell.font = Font(
+                bold=True,
+                size=15,
+                color=GREEN
+            )
+
+
+        elif column == 2:
+
+            header_cell.fill = PatternFill(
+                'solid',
+                fgColor=RED
+            )
+
+            value_cell.fill = PatternFill(
+                'solid',
+                fgColor=RED_LIGHT
+            )
+
+            value_cell.font = Font(
+                bold=True,
+                size=15,
+                color=RED
+            )
+
+
+        else:
+
+            header_cell.fill = PatternFill(
+                'solid',
+                fgColor=INDIGO
+            )
+
+            value_cell.fill = PatternFill(
+                'solid',
+                fgColor=INDIGO_LIGHT
+            )
+
+            value_cell.font = Font(
+                bold=True,
+                size=15,
+                color=INDIGO
+            )
+
+
+        value_cell.number_format = (
+            '₹#,##0.00'
+        )
+
+
+    worksheet.row_dimensions[11].height = 22
+    worksheet.row_dimensions[12].height = 30
+
+
+    # =========================================================
+    # CATEGORY SUMMARY
+    # =========================================================
+
+    worksheet['A14'] = 'Category-wise Summary'
+
+    worksheet['A14'].font = Font(
+        bold=True,
+        size=13,
+        color=INDIGO_DARK
+    )
+
+
+    category_headers = [
+        'Category',
+        'Type',
+        'Total'
+    ]
+
+
+    for column, header in enumerate(
+        category_headers,
+        start=1
+    ):
+
+        cell = worksheet.cell(
+            row=15,
+            column=column,
+            value=header
+        )
+
+        cell.font = Font(
+            bold=True,
+            color=WHITE
+        )
+
+        cell.fill = PatternFill(
+            'solid',
+            fgColor=INDIGO
+        )
+
+        cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+
+        cell.border = thin_border
+
+
+    row = 16
+
 
     for item in category_summary:
-        worksheet.cell(
+
+        category_cell = worksheet.cell(
             row=row,
             column=1,
             value=item['category__name']
         )
 
-        worksheet.cell(
+
+        type_cell = worksheet.cell(
             row=row,
             column=2,
             value=item['category__type'].title()
         )
 
-        worksheet.cell(
+
+        amount_cell = worksheet.cell(
             row=row,
             column=3,
             value=float(item['total'])
         )
 
+
+        category_cell.border = thin_border
+        type_cell.border = thin_border
+        amount_cell.border = thin_border
+
+
+        category_cell.alignment = Alignment(
+            horizontal='left',
+            vertical='center'
+        )
+
+
+        type_cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+
+
+        amount_cell.alignment = Alignment(
+            horizontal='right',
+            vertical='center'
+        )
+
+
+        amount_cell.number_format = (
+            '₹#,##0.00'
+        )
+
+
+        # Alternating row background
+
+        if row % 2 == 0:
+
+            for column in range(1, 4):
+
+                worksheet.cell(
+                    row=row,
+                    column=column
+                ).fill = PatternFill(
+                    'solid',
+                    fgColor=ROW_LIGHT
+                )
+
+
+        # Type colors
+
+        if item['category__type'] == 'income':
+
+            type_cell.font = Font(
+                bold=True,
+                color=GREEN
+            )
+
+            amount_cell.font = Font(
+                bold=True,
+                color=GREEN
+            )
+
+        else:
+
+            type_cell.font = Font(
+                bold=True,
+                color=RED
+            )
+
+            amount_cell.font = Font(
+                bold=True,
+                color=RED
+            )
+
+
         row += 1
 
-    worksheet.column_dimensions['A'].width = 25
-    worksheet.column_dimensions['B'].width = 20
-    worksheet.column_dimensions['C'].width = 15
+
+    # =========================================================
+    # EMPTY REPORT STATE
+    # =========================================================
+
+    if row == 16:
+
+        worksheet.merge_cells(
+            start_row=row,
+            start_column=1,
+            end_row=row,
+            end_column=3
+        )
+
+
+        empty_cell = worksheet.cell(
+            row=row,
+            column=1
+        )
+
+        empty_cell.value = (
+            'No transactions found for this period.'
+        )
+
+        empty_cell.font = Font(
+            italic=True,
+            color=TEXT_MUTED
+        )
+
+        empty_cell.alignment = Alignment(
+            horizontal='center',
+            vertical='center'
+        )
+
+        empty_cell.fill = PatternFill(
+            'solid',
+            fgColor=INDIGO_LIGHT
+        )
+
+        empty_cell.border = thin_border
+
+
+    # =========================================================
+    # TABLE FILTER
+    # =========================================================
+
+    if row > 16:
+
+        worksheet.auto_filter.ref = (
+            f'A15:C{row - 1}'
+        )
+
+
+    # =========================================================
+    # FOOTER
+    # =========================================================
+
+    footer_row = row + 2
+
+
+    worksheet.merge_cells(
+        start_row=footer_row,
+        start_column=1,
+        end_row=footer_row,
+        end_column=3
+    )
+
+
+    footer_cell = worksheet.cell(
+        row=footer_row,
+        column=1
+    )
+
+
+    footer_cell.value = (
+        'Expense Tracker • '
+        'Generated financial report'
+    )
+
+
+    footer_cell.font = Font(
+        italic=True,
+        size=9,
+        color=TEXT_MUTED
+    )
+
+
+    footer_cell.alignment = Alignment(
+        horizontal='center'
+    )
+
+
+    # =========================================================
+    # COLUMN WIDTHS
+    # =========================================================
+
+    worksheet.column_dimensions['A'].width = 30
+    worksheet.column_dimensions['B'].width = 22
+    worksheet.column_dimensions['C'].width = 20
+
+
+    # =========================================================
+    # PRINT AREA
+    # =========================================================
+
+    worksheet.print_area = (
+        f'A1:C{footer_row}'
+    )
+
+
+    # =========================================================
+    # RESPONSE
+    # =========================================================
 
     response = HttpResponse(
         content_type=(
@@ -1730,11 +2286,24 @@ def export_report_excel(request):
         )
     )
 
-    response['Content-Disposition'] = (
-        'attachment; filename="expense_report.xlsx"'
+
+    filename = (
+        f'Expense_Tracker_'
+        f'{report_type.title()}_Report.xlsx'
     )
 
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="{filename}"'
+    )
+
+
     workbook.save(response)
+
+
+    # =========================================================
+    # SAVE REPORT HISTORY
+    # =========================================================
 
     Report.objects.create(
         user=request.user,
@@ -1743,5 +2312,6 @@ def export_report_excel(request):
         start_date=start_date,
         end_date=end_date
     )
+
 
     return response
