@@ -7,9 +7,11 @@ from django.db import models
 from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.contrib.auth import update_session_auth_hash
 
 from .forms import (
     BudgetForm,
+    CustomPasswordChangeForm,
     ProfileForm,
     RegistrationForm,
     TransactionForm,
@@ -100,6 +102,35 @@ def profile(request):
         {
             'form': form,
         }
+    )
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = CustomPasswordChangeForm(
+            user=request.user,
+            data=request.POST
+        )
+
+        if form.is_valid():
+            user = form.save()
+
+            # Keep the user logged in after changing the password.
+            update_session_auth_hash(request, user)
+
+            messages.success(
+                request,
+                'Your password has been changed successfully.'
+            )
+
+            return redirect('profile')
+    else:
+        form = CustomPasswordChangeForm(user=request.user)
+
+    return render(
+        request,
+        'tracker/change_password.html',
+        {'form': form}
     )
 @login_required
 def dashboard(request):

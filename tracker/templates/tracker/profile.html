@@ -14,7 +14,6 @@
 
     <title>My Profile - Expense Tracker</title>
 
-    <!-- Global Styles -->
     <link
         rel="stylesheet"
         href="{% static 'tracker/css/style.css' %}"
@@ -32,16 +31,23 @@
         href="{% static 'tracker/favicon.png' %}?v=3"
     >
 
+
     <style>
 
         body {
             background: #f5f7fb;
         }
 
+
+        /* =====================================================
+           PAGE
+           ===================================================== */
+
         .page {
             min-height: 100vh;
             padding: 30px;
         }
+
 
         .page-container {
             width: min(980px, 94%);
@@ -63,15 +69,18 @@
             margin-bottom: 25px;
         }
 
+
         .page-title h1 {
             font-size: 30px;
             margin-bottom: 5px;
         }
 
+
         .page-title p {
             color: #6b7280;
             font-size: 14px;
         }
+
 
         .back-btn {
             display: inline-flex;
@@ -92,16 +101,17 @@
             font-size: 13px;
             font-weight: 600;
 
+            text-decoration: none;
+
             box-shadow: var(--shadow-sm);
 
             transition: 0.2s ease;
         }
 
+
         .back-btn:hover {
             color: #4f46e5;
-
             border-color: #6366f1;
-
             transform: translateY(-1px);
         }
 
@@ -173,7 +183,6 @@
 
         .profile-card h2 {
             font-size: 19px;
-
             margin-bottom: 4px;
         }
 
@@ -426,6 +435,8 @@
 
             justify-content: flex-end;
 
+            align-items: center;
+
             gap: 10px;
 
             margin-top: 28px;
@@ -437,7 +448,8 @@
 
 
         .cancel-btn,
-        .save-btn {
+        .save-btn,
+        .password-btn {
 
             display: inline-flex;
 
@@ -457,7 +469,10 @@
 
             cursor: pointer;
 
+            text-decoration: none;
+
             transition: 0.2s ease;
+
         }
 
 
@@ -474,6 +489,8 @@
         .cancel-btn:hover {
 
             background: #f1f5f9;
+
+            color: #374151;
         }
 
 
@@ -499,6 +516,30 @@
         }
 
 
+        .password-btn {
+
+            background: #eef2ff;
+
+            border: 1px solid #c7d2fe;
+
+            color: #4f46e5;
+        }
+
+
+        .password-btn:hover {
+
+            background: #e0e7ff;
+
+            border-color: #a5b4fc;
+
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 5px 12px
+                rgba(99, 102, 241, 0.12);
+        }
+
+
         /* =====================================================
            RESPONSIVE
            ===================================================== */
@@ -509,28 +550,50 @@
                 padding: 20px 12px;
             }
 
+
             .page-container {
                 width: 100%;
             }
+
 
             .page-header {
                 flex-direction: column;
             }
 
+
             .back-btn {
                 width: 100%;
             }
+
 
             .profile-grid {
                 grid-template-columns: 1fr;
             }
 
+
             .profile-card {
                 text-align: center;
             }
 
+
             .account-info {
                 text-align: left;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+
+            .cancel-btn,
+            .save-btn,
+            .password-btn {
+                width: 100%;
             }
 
         }
@@ -542,17 +605,9 @@
                 padding: 22px 18px;
             }
 
+
             .profile-card {
                 padding: 22px 18px;
-            }
-
-            .form-actions {
-                flex-direction: column-reverse;
-            }
-
-            .cancel-btn,
-            .save-btn {
-                width: 100%;
             }
 
         }
@@ -679,9 +734,13 @@
                         <span class="info-value">
 
                             {% if request.user.is_staff %}
+
                                 Administrator
+
                             {% else %}
+
                                 Regular User
+
                             {% endif %}
 
                         </span>
@@ -700,6 +759,7 @@
                         </span>
 
                     </div>
+
 
                 </div>
 
@@ -744,7 +804,6 @@
                         ℹ
                     </div>
 
-
                     <div>
                         Keep your contact information up to date.
                         Changes are saved to your Expense Tracker account.
@@ -764,6 +823,10 @@
                     {{ form.as_p }}
 
 
+                    <!-- =================================================
+                         ACTION BUTTONS
+                         ================================================= -->
+
                     <div class="form-actions">
 
 
@@ -772,6 +835,14 @@
                             class="cancel-btn"
                         >
                             Cancel
+                        </a>
+
+
+                        <a
+                            href="{% url 'change_password' %}"
+                            class="password-btn"
+                        >
+                            🔒 Change Password
                         </a>
 
 
@@ -784,6 +855,7 @@
 
 
                     </div>
+
 
                 </form>
 
