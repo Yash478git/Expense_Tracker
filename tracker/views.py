@@ -22,7 +22,18 @@ from django.http import HttpResponse
 
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle,
+)
+
+from reportlab.lib.enums import (
+    TA_LEFT,
+    TA_CENTER,
+    TA_RIGHT,
+)
+
+from xml.sax.saxutils import escape
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -540,12 +551,16 @@ def export_report_pdf(request):
             month=1,
             day=1
         )
+
         end_date = today.replace(
             month=12,
             day=31
         )
+
     else:
-        start_date = today.replace(day=1)
+        start_date = today.replace(
+            day=1
+        )
 
         if today.month == 12:
             next_month = today.replace(
@@ -553,6 +568,7 @@ def export_report_pdf(request):
                 month=1,
                 day=1
             )
+
         else:
             next_month = today.replace(
                 month=today.month + 1,
@@ -561,10 +577,16 @@ def export_report_pdf(request):
 
         end_date = next_month - timedelta(days=1)
 
+
+    # =========================================================
+    # FETCH REPORT DATA
+    # =========================================================
+
     transactions = request.user.transactions.filter(
         date__gte=start_date,
         date__lte=end_date
     )
+
 
     total_income = transactions.filter(
         type='income'
@@ -572,13 +594,19 @@ def export_report_pdf(request):
         total=Sum('amount')
     )['total'] or 0
 
+
     total_expenses = transactions.filter(
         type='expense'
     ).aggregate(
         total=Sum('amount')
     )['total'] or 0
 
+
     balance = total_income - total_expenses
+
+
+    transaction_count = transactions.count()
+
 
     category_summary = transactions.values(
         'category__name',
@@ -587,110 +615,986 @@ def export_report_pdf(request):
         total=Sum('amount')
     ).order_by('-total')
 
+
+    # =========================================================
+    # PDF RESPONSE
+    # =========================================================
+
     response = HttpResponse(
         content_type='application/pdf'
     )
 
-    response['Content-Disposition'] = (
-        'attachment; filename="expense_report.pdf"'
+    filename = (
+        f'Expense_Tracker_'
+        f'{report_type.title()}_Report.pdf'
     )
+
+    response['Content-Disposition'] = (
+        f'attachment; filename="{filename}"'
+    )
+
+
+    # =========================================================
+    # DOCUMENT
+    # =========================================================
 
     document = SimpleDocTemplate(
         response,
-        pagesize=A4
+        pagesize=A4,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=42,
+        bottomMargin=42,
+        title=(
+            f'Expense Tracker - '
+            f'{report_type.title()} Report'
+        ),
+        author='Expense Tracker',
     )
+
+
+    # =========================================================
+    # COLORS
+    # =========================================================
+
+    INDIGO = colors.HexColor('#4F46E5')
+    INDIGO_DARK = colors.HexColor('#3730A3')
+    INDIGO_LIGHT = colors.HexColor('#EEF2FF')
+
+    TEXT_DARK = colors.HexColor('#111827')
+    TEXT_MUTED = colors.HexColor('#6B7280')
+
+    BORDER = colors.HexColor('#E5E7EB')
+    ROW_LIGHT = colors.HexColor('#F9FAFB')
+
+    GREEN = colors.HexColor('#059669')
+    GREEN_LIGHT = colors.HexColor('#ECFDF5')
+
+    RED = colors.HexColor('#DC2626')
+    RED_LIGHT = colors.HexColor('#FEF2F2')
+
+    BLUE_LIGHT = colors.HexColor('#EFF6FF')
+
+
+    # =========================================================
+    # STYLES
+    # =========================================================
 
     styles = getSampleStyleSheet()
+
+
+    report_title_style = ParagraphStyle(
+        'ReportTitle',
+        parent=styles['Title'],
+        fontName='Helvetica-Bold',
+        fontSize=22,
+        leading=26,
+        textColor=colors.white,
+        alignment=TA_LEFT,
+        spaceAfter=0,
+    )
+
+
+    report_type_style = ParagraphStyle(
+        'ReportType',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=11,
+        leading=14,
+        textColor=colors.white,
+        alignment=TA_RIGHT,
+    )
+
+
+    subtitle_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=12,
+        textColor=TEXT_MUTED,
+    )
+
+
+    section_style = ParagraphStyle(
+        'Section',
+        parent=styles['Heading2'],
+        fontName='Helvetica-Bold',
+        fontSize=14,
+        leading=18,
+        textColor=TEXT_DARK,
+        spaceAfter=4,
+    )
+
+
+    small_style = ParagraphStyle(
+        'Small',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11,
+        textColor=TEXT_MUTED,
+    )
+
+
+    card_label_style = ParagraphStyle(
+        'CardLabel',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8,
+        leading=10,
+        textColor=TEXT_MUTED,
+        alignment=TA_CENTER,
+    )
+
+
+    income_value_style = ParagraphStyle(
+        'IncomeValue',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=16,
+        leading=20,
+        textColor=GREEN,
+        alignment=TA_CENTER,
+    )
+
+
+    expense_value_style = ParagraphStyle(
+        'ExpenseValue',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=16,
+        leading=20,
+        textColor=RED,
+        alignment=TA_CENTER,
+    )
+
+
+    balance_value_style = ParagraphStyle(
+        'BalanceValue',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=16,
+        leading=20,
+        textColor=INDIGO,
+        alignment=TA_CENTER,
+    )
+
+
+    table_header_style = ParagraphStyle(
+        'TableHeader',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        leading=11,
+        textColor=colors.white,
+        alignment=TA_LEFT,
+    )
+
+
+    table_text_style = ParagraphStyle(
+        'TableText',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=8.5,
+        leading=11,
+        textColor=TEXT_DARK,
+    )
+
+
+    table_amount_style = ParagraphStyle(
+        'TableAmount',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=8.5,
+        leading=11,
+        alignment=TA_RIGHT,
+    )
+
+
+    # =========================================================
+    # PAGE DECORATION
+    # =========================================================
+
+    def draw_page_decor(canvas, doc):
+        canvas.saveState()
+
+        page_width, page_height = A4
+
+        # Top accent
+        canvas.setFillColor(INDIGO)
+        canvas.rect(
+            0,
+            page_height - 7,
+            page_width,
+            7,
+            stroke=0,
+            fill=1
+        )
+
+        # Footer line
+        canvas.setStrokeColor(BORDER)
+        canvas.setLineWidth(0.6)
+        canvas.line(
+            36,
+            30,
+            page_width - 36,
+            30
+        )
+
+        # Footer text
+        canvas.setFillColor(TEXT_MUTED)
+        canvas.setFont(
+            'Helvetica',
+            7.5
+        )
+
+        canvas.drawString(
+            36,
+            18,
+            'Expense Tracker • Financial Report'
+        )
+
+        canvas.drawRightString(
+            page_width - 36,
+            18,
+            f'Page {doc.page}'
+        )
+
+        canvas.restoreState()
+
+
+    # =========================================================
+    # CONTENT
+    # =========================================================
+
     elements = []
 
+
+    # =========================================================
+    # HEADER
+    # =========================================================
+
+    user_name = (
+        request.user.get_full_name().strip()
+        or request.user.username
+    )
+
+
+    header_table = Table(
+        [
+            [
+                Paragraph(
+                    'EXPENSE TRACKER',
+                    report_title_style
+                ),
+
+                Paragraph(
+                    f'{report_type.title()} Report',
+                    report_type_style
+                )
+            ]
+        ],
+        colWidths=[
+            350,
+            173
+        ],
+        rowHeights=[70],
+    )
+
+
+    header_table.setStyle(
+        TableStyle([
+            (
+                'BACKGROUND',
+                (0, 0),
+                (-1, -1),
+                INDIGO
+            ),
+
+            (
+                'VALIGN',
+                (0, 0),
+                (-1, -1),
+                'MIDDLE'
+            ),
+
+            (
+                'LEFTPADDING',
+                (0, 0),
+                (-1, -1),
+                18
+            ),
+
+            (
+                'RIGHTPADDING',
+                (0, 0),
+                (-1, -1),
+                18
+            ),
+
+            (
+                'TOPPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                'BOTTOMPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+        ])
+    )
+
+
+    elements.append(header_table)
+
+    elements.append(
+        Spacer(1, 14)
+    )
+
+
+    # =========================================================
+    # REPORT INFORMATION
+    # =========================================================
+
+    info_table = Table(
+        [
+            [
+                Paragraph(
+                    f'<b>Prepared for:</b> '
+                    f'{escape(user_name)}',
+                    small_style
+                ),
+
+                Paragraph(
+                    f'<b>Period:</b> '
+                    f'{start_date.strftime("%d %b %Y")} '
+                    f'– '
+                    f'{end_date.strftime("%d %b %Y")}',
+                    small_style
+                )
+            ],
+
+            [
+                Paragraph(
+                    f'<b>Generated:</b> '
+                    f'{today.strftime("%d %b %Y")}',
+                    small_style
+                ),
+
+                Paragraph(
+                    f'<b>Transactions:</b> '
+                    f'{transaction_count}',
+                    small_style
+                )
+            ]
+        ],
+        colWidths=[
+            261.5,
+            261.5
+        ],
+    )
+
+
+    info_table.setStyle(
+        TableStyle([
+            (
+                'BACKGROUND',
+                (0, 0),
+                (-1, -1),
+                colors.white
+            ),
+
+            (
+                'BOX',
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                'INNERGRID',
+                (0, 0),
+                (-1, -1),
+                0.4,
+                BORDER
+            ),
+
+            (
+                'LEFTPADDING',
+                (0, 0),
+                (-1, -1),
+                12
+            ),
+
+            (
+                'RIGHTPADDING',
+                (0, 0),
+                (-1, -1),
+                12
+            ),
+
+            (
+                'TOPPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                'BOTTOMPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+        ])
+    )
+
+
+    elements.append(info_table)
+
+    elements.append(
+        Spacer(1, 18)
+    )
+
+
+    # =========================================================
+    # FINANCIAL SUMMARY
+    # =========================================================
+
     elements.append(
         Paragraph(
-            f"Expense Tracker - {report_type.title()} Report",
-            styles['Title']
+            'Financial Overview',
+            section_style
         )
     )
 
     elements.append(
-        Spacer(1, 12)
-    )
-
-    elements.append(
         Paragraph(
-            f"Period: {start_date} to {end_date}",
-            styles['Normal']
+            'A summary of your financial activity for the selected period.',
+            subtitle_style
         )
     )
 
     elements.append(
-        Spacer(1, 12)
+        Spacer(1, 9)
     )
+
+
+    income_text = (
+        f'Rs. {total_income:,.2f}'
+    )
+
+    expense_text = (
+        f'Rs. {total_expenses:,.2f}'
+    )
+
+    balance_text = (
+        f'Rs. {balance:,.2f}'
+    )
+
+
+    summary_table = Table(
+        [
+            [
+                [
+                    Paragraph(
+                        'TOTAL INCOME',
+                        card_label_style
+                    ),
+
+                    Spacer(1, 6),
+
+                    Paragraph(
+                        income_text,
+                        income_value_style
+                    )
+                ],
+
+                [
+                    Paragraph(
+                        'TOTAL EXPENSES',
+                        card_label_style
+                    ),
+
+                    Spacer(1, 6),
+
+                    Paragraph(
+                        expense_text,
+                        expense_value_style
+                    )
+                ],
+
+                [
+                    Paragraph(
+                        'CURRENT BALANCE',
+                        card_label_style
+                    ),
+
+                    Spacer(1, 6),
+
+                    Paragraph(
+                        balance_text,
+                        balance_value_style
+                    )
+                ]
+            ]
+        ],
+        colWidths=[
+            174,
+            174,
+            174
+        ],
+    )
+
+
+    summary_table.setStyle(
+        TableStyle([
+            (
+                'BACKGROUND',
+                (0, 0),
+                (0, 0),
+                GREEN_LIGHT
+            ),
+
+            (
+                'BACKGROUND',
+                (1, 0),
+                (1, 0),
+                RED_LIGHT
+            ),
+
+            (
+                'BACKGROUND',
+                (2, 0),
+                (2, 0),
+                INDIGO_LIGHT
+            ),
+
+            (
+                'BOX',
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                'INNERGRID',
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                'VALIGN',
+                (0, 0),
+                (-1, -1),
+                'MIDDLE'
+            ),
+
+            (
+                'ALIGN',
+                (0, 0),
+                (-1, -1),
+                'CENTER'
+            ),
+
+            (
+                'TOPPADDING',
+                (0, 0),
+                (-1, -1),
+                14
+            ),
+
+            (
+                'BOTTOMPADDING',
+                (0, 0),
+                (-1, -1),
+                14
+            ),
+
+            (
+                'LEFTPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                'RIGHTPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+        ])
+    )
+
+
+    elements.append(summary_table)
+
+    elements.append(
+        Spacer(1, 22)
+    )
+
+
+    # =========================================================
+    # CATEGORY SUMMARY
+    # =========================================================
 
     elements.append(
         Paragraph(
-            f"Total Income: ₹{total_income}",
-            styles['Normal']
+            'Category-wise Summary',
+            section_style
         )
     )
 
     elements.append(
         Paragraph(
-            f"Total Expenses: ₹{total_expenses}",
-            styles['Normal']
+            'Breakdown of income and expenses by category.',
+            subtitle_style
         )
     )
 
     elements.append(
-        Paragraph(
-            f"Balance: ₹{balance}",
-            styles['Normal']
-        )
+        Spacer(1, 9)
     )
+
+
+    table_data = [
+        [
+            Paragraph(
+                'CATEGORY',
+                table_header_style
+            ),
+
+            Paragraph(
+                'TYPE',
+                table_header_style
+            ),
+
+            Paragraph(
+                'TOTAL',
+                table_header_style
+            )
+        ]
+    ]
+
+
+    for item in category_summary:
+
+        category_name = escape(
+            str(item['category__name'])
+        )
+
+        category_type = item[
+            'category__type'
+        ].title()
+
+        total_value = item['total']
+
+
+        if item['category__type'] == 'income':
+
+            type_color = '#059669'
+
+        else:
+
+            type_color = '#DC2626'
+
+
+        table_data.append(
+            [
+                Paragraph(
+                    category_name,
+                    table_text_style
+                ),
+
+                Paragraph(
+                    (
+                        f'<font color="{type_color}">'
+                        f'<b>{category_type}</b>'
+                        f'</font>'
+                    ),
+                    table_text_style
+                ),
+
+                Paragraph(
+                    f'Rs. {total_value:,.2f}',
+                    table_amount_style
+                )
+            ]
+        )
+
+
+    if len(table_data) > 1:
+
+        category_table = Table(
+            table_data,
+            colWidths=[
+                230,
+                105,
+                188
+            ],
+            repeatRows=1,
+        )
+
+
+        category_table_style = [
+            (
+                'BACKGROUND',
+                (0, 0),
+                (-1, 0),
+                INDIGO
+            ),
+
+            (
+                'TEXTCOLOR',
+                (0, 0),
+                (-1, 0),
+                colors.white
+            ),
+
+            (
+                'BOX',
+                (0, 0),
+                (-1, -1),
+                0.7,
+                BORDER
+            ),
+
+            (
+                'INNERGRID',
+                (0, 0),
+                (-1, -1),
+                0.4,
+                BORDER
+            ),
+
+            (
+                'VALIGN',
+                (0, 0),
+                (-1, -1),
+                'MIDDLE'
+            ),
+
+            (
+                'LEFTPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                'RIGHTPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                'TOPPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                'BOTTOMPADDING',
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+        ]
+
+
+        # Alternating row backgrounds
+        for row_index in range(
+            1,
+            len(table_data)
+        ):
+
+            if row_index % 2 == 0:
+
+                category_table_style.append(
+                    (
+                        'BACKGROUND',
+                        (0, row_index),
+                        (-1, row_index),
+                        ROW_LIGHT
+                    )
+                )
+
+
+        category_table.setStyle(
+            TableStyle(category_table_style)
+        )
+
+
+        elements.append(category_table)
+
+
+    else:
+
+        empty_table = Table(
+            [
+                [
+                    Paragraph(
+                        'No transactions found for this period.',
+                        small_style
+                    )
+                ]
+            ],
+            colWidths=[523],
+        )
+
+
+        empty_table.setStyle(
+            TableStyle([
+                (
+                    'BACKGROUND',
+                    (0, 0),
+                    (-1, -1),
+                    BLUE_LIGHT
+                ),
+
+                (
+                    'BOX',
+                    (0, 0),
+                    (-1, -1),
+                    0.7,
+                    BORDER
+                ),
+
+                (
+                    'LEFTPADDING',
+                    (0, 0),
+                    (-1, -1),
+                    12
+                ),
+
+                (
+                    'RIGHTPADDING',
+                    (0, 0),
+                    (-1, -1),
+                    12
+                ),
+
+                (
+                    'TOPPADDING',
+                    (0, 0),
+                    (-1, -1),
+                    14
+                ),
+
+                (
+                    'BOTTOMPADDING',
+                    (0, 0),
+                    (-1, -1),
+                    14
+                ),
+            ])
+        )
+
+
+        elements.append(empty_table)
+
 
     elements.append(
         Spacer(1, 20)
     )
 
-    elements.append(
-        Paragraph(
-            "Category-wise Summary",
-            styles['Heading2']
-        )
+
+    # =========================================================
+    # REPORT NOTE
+    # =========================================================
+
+    note_table = Table(
+        [
+            [
+                Paragraph(
+                    '<b>Expense Tracker</b><br/>'
+                    'This report is generated from the transactions '
+                    'recorded in your account for the selected period.',
+                    small_style
+                )
+            ]
+        ],
+        colWidths=[523],
     )
 
-    table_data = [
-        ['Category', 'Type', 'Total']
-    ]
 
-    for item in category_summary:
-        table_data.append([
-            item['category__name'],
-            item['category__type'].title(),
-            f"₹{item['total']}",
+    note_table.setStyle(
+        TableStyle([
+            (
+                'BACKGROUND',
+                (0, 0),
+                (-1, -1),
+                INDIGO_LIGHT
+            ),
+
+            (
+                'BOX',
+                (0, 0),
+                (-1, -1),
+                0.7,
+                colors.HexColor('#C7D2FE')
+            ),
+
+            (
+                'LEFTPADDING',
+                (0, 0),
+                (-1, -1),
+                12
+            ),
+
+            (
+                'RIGHTPADDING',
+                (0, 0),
+                (-1, -1),
+                12
+            ),
+
+            (
+                'TOPPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
+
+            (
+                'BOTTOMPADDING',
+                (0, 0),
+                (-1, -1),
+                10
+            ),
         ])
+    )
 
-    if len(table_data) > 1:
-        table = Table(table_data)
 
-        table.setStyle(
-            TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-                ('GRID', (0, 0), (-1, -1), 1, colors.black),
-                ('PADDING', (0, 0), (-1, -1), 6),
-            ])
-        )
+    elements.append(note_table)
 
-        elements.append(table)
 
-    else:
-        elements.append(
-            Paragraph(
-                "No transactions found for this period.",
-                styles['Normal']
-            )
-        )
+    # =========================================================
+    # BUILD PDF
+    # =========================================================
 
-    document.build(elements)
+    document.build(
+        elements,
+        onFirstPage=draw_page_decor,
+        onLaterPages=draw_page_decor
+    )
+
+
+    # =========================================================
+    # SAVE REPORT HISTORY
+    # =========================================================
 
     Report.objects.create(
         user=request.user,
@@ -700,8 +1604,8 @@ def export_report_pdf(request):
         end_date=end_date
     )
 
-    return response
 
+    return response
 
 @login_required
 def export_report_excel(request):
