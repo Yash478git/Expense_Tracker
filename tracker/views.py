@@ -8,7 +8,12 @@ from datetime import timedelta
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-from .forms import BudgetForm, RegistrationForm, TransactionForm
+from .forms import (
+    BudgetForm,
+    ProfileForm,
+    RegistrationForm,
+    TransactionForm,
+)
 from .models import Budget, Category, Transaction, Report
 
 from django.http import HttpResponse
@@ -66,6 +71,36 @@ def user_login(request):
 
     return render(request, 'tracker/login.html')
 
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        form = ProfileForm(
+            request.POST,
+            user=request.user
+        )
+
+        if form.is_valid():
+            form.save()
+
+            messages.success(
+                request,
+                'Profile updated successfully.'
+            )
+
+            return redirect('profile')
+
+    else:
+        form = ProfileForm(
+            user=request.user
+        )
+
+    return render(
+        request,
+        'tracker/profile.html',
+        {
+            'form': form,
+        }
+    )
 @login_required
 def dashboard(request):
     transactions = request.user.transactions.all()
