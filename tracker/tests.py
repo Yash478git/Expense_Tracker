@@ -5,6 +5,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from unittest.mock import patch
+
+from django.contrib.auth.hashers import make_password
 from .models import (
     Budget,
     Category,
@@ -12,6 +15,7 @@ from .models import (
     Report,
     Transaction,
     UserProfile,
+    EmailOTP,
 )
 from .views import (
     calculate_next_recurring_date,
@@ -857,7 +861,23 @@ class ProfileAndPasswordTests(ExpenseTrackerBaseTestCase):
             200
         )
 
-    def test_change_password(self):
+    @patch('tracker.views.send_otp')
+    def test_change_password(self, mock_send_otp):
+        mock_send_otp.return_value = (
+            True,
+            'OTP sent successfully.'
+        )
+
+        # Create the OTP record that the real view expects
+        # send_otp() to have created.
+        EmailOTP.objects.create(
+            user=self.user,
+            email=self.user.email,
+            otp_hash=make_password('123456'),
+            purpose='password_change',
+            expires_at=timezone.now() + timedelta(minutes=10),
+        )
+
         response = self.client.post(
             reverse('change_password'),
             {
@@ -866,6 +886,60 @@ class ProfileAndPasswordTests(ExpenseTrackerBaseTestCase):
                 'new_password2': 'NewTestPass456!',
             }
         )
+
+        self.assertRedirects(
+            response,
+            reverse('verify_password_change_otp')
+        )
+
+        self.user.refresh_from_db()
+
+        # Password must not change before OTP verification.
+        self.assertTrue(
+            self.user.check_password(
+                'TestPass123!'
+            )
+        )
+
+        self.assertFalse(
+            self.user.check_password(
+                'NewTestPass456!'
+            )
+        )
+
+        otp_record = (
+            EmailOTP.objects
+            .filter(
+                user=self.user,
+                purpose='password_change',
+                is_used=False,
+            )
+            .order_by('-created_at')
+            .first()
+        )
+
+        self.assertIsNotNone(
+            otp_record
+        )
+
+        self.assertIsNotNone(
+            otp_record.pending_password_hash
+        )
+
+        with patch(
+            'tracker.views.verify_otp',
+            return_value=(
+                True,
+                'OTP verified successfully.',
+                otp_record,
+            )
+        ):
+            response = self.client.post(
+                reverse('verify_password_change_otp'),
+                {
+                    'otp': '123456',
+                }
+            )
 
         self.assertRedirects(
             response,
