@@ -5,6 +5,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Sum
 from django.db import models, transaction
 import calendar
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.hashers import make_password
 
 from datetime import date, timedelta
 from django.utils import timezone
@@ -25,8 +27,9 @@ from .models import (
     Transaction,
     Report,
     RecurringTransaction,
+    UserProfile,
+    EmailOTP,
 )
-
 from django.http import HttpResponse
 
 from reportlab.lib import colors
@@ -60,6 +63,10 @@ from openpyxl.styles import (
     Alignment,
 )
 from openpyxl.utils import get_column_letter
+
+from django.db import transaction as db_transaction
+
+from .otp_service import send_otp, verify_otp
 
 
 # =========================================================
@@ -223,39 +230,395 @@ def register(request):
         form = RegistrationForm(request.POST)
 
         if form.is_valid():
-            form.save()
-            messages.success(
-                request,
-                'Registration successful. You can now log in.'
-            )
-            return redirect('login')
+            email = form.cleaned_data['email']
+
+            try:
+                with db_transaction.atomic():
+                    user = form.save(commit=False)
+
+                    # Account remains inactive until email verification.
+                    user.is_active = False
+                    user.save()
+
+                    UserProfile.objects.update_or_create(
+                        user=user,
+                        defaults={
+                            'phone': form.cleaned_data['phone']
+                        }
+                    )
+
+                    success, message = send_otp(
+                        email=email,
+                        purpose='registration',
+                        user=user,
+                    )
+
+                    if not success:
+                        raise ValueError(message)
+
+                request.session['registration_user_id'] = user.id
+
+                messages.success(
+                    request,
+                    'A verification OTP has been sent to your email.'
+                )
+
+                return redirect(
+                    'verify_registration_otp'
+                )
+
+            except Exception:
+                if 'user' in locals() and user.pk:
+                    user.delete()
+
+                messages.error(
+                    request,
+                    'We could not send the verification OTP. '
+                    'Please try again.'
+                )
+
     else:
         form = RegistrationForm()
 
-    return render(request, 'tracker/register.html', {'form': form})
+    return render(
+        request,
+        'tracker/register.html',
+        {'form': form}
+    )
 
+    return render(request, 'tracker/register.html', {'form': form})
+def verify_registration_otp(request):
+    user_id = request.session.get(
+        'registration_user_id'
+    )
+
+    if not user_id:
+        messages.error(
+            request,
+            'Your registration verification session has expired. '
+            'Please register again.'
+        )
+        return redirect('register')
+
+    user = get_object_or_404(
+        User,
+        pk=user_id,
+        is_active=False,
+    )
+
+    if request.method == 'POST':
+        otp = request.POST.get(
+            'otp',
+            ''
+        ).strip()
+
+        if not otp.isdigit() or len(otp) != 6:
+            messages.error(
+                request,
+                'Please enter a valid 6-digit OTP.'
+            )
+
+            return render(
+                request,
+                'tracker/verify_otp.html',
+                {
+                    'purpose': 'registration',
+                    'email': user.email,
+                }
+            )
+
+        success, message, otp_record = verify_otp(
+            email=user.email,
+            purpose='registration',
+            otp=otp,
+        )
+
+        if success:
+            with db_transaction.atomic():
+                user.is_active = True
+                user.save(
+                    update_fields=['is_active']
+                )
+
+            request.session.pop(
+                'registration_user_id',
+                None
+            )
+
+            messages.success(
+                request,
+                'Email verified successfully. '
+                'Your account is now active.'
+            )
+
+            return redirect('login')
+
+        messages.error(
+            request,
+            message
+        )
+
+    return render(
+        request,
+        'tracker/verify_otp.html',
+        {
+            'purpose': 'registration',
+            'email': user.email,
+        }
+    )
 def user_login(request):
     if request.method == 'POST':
-        email = request.POST.get('email', '').strip()
-        password = request.POST.get('password', '')
+        email_or_username = request.POST.get(
+            'email',
+            ''
+        ).strip()
 
+        password = request.POST.get(
+            'password',
+            ''
+        )
+
+        # Try login using username first.
         user = authenticate(
             request,
-            username=email,
+            username=email_or_username,
             password=password
         )
+
+        # If username login fails, try matching the email.
+        if user is None:
+            matching_user = User.objects.filter(
+                email__iexact=email_or_username
+            ).first()
+
+            if matching_user is not None:
+                user = authenticate(
+                    request,
+                    username=matching_user.username,
+                    password=password
+                )
 
         if user is not None:
             login(request, user)
 
+            # Administrator accounts go directly
+            # to the custom admin dashboard.
             if user.is_staff:
                 return redirect('admin_dashboard')
 
+            # Regular users go to the normal dashboard.
             return redirect('dashboard')
 
-        messages.error(request, 'Invalid email or password.')
+        messages.error(
+            request,
+            'Invalid username/email or password.'
+        )
 
-    return render(request, 'tracker/login.html')
+    return render(
+        request,
+        'tracker/login.html'
+    )
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get(
+            'email',
+            ''
+        ).strip().lower()
+
+        user = User.objects.filter(
+            email__iexact=email,
+            is_active=True,
+        ).first()
+
+        if user is not None:
+            success, message = send_otp(
+                email=user.email,
+                purpose='password_reset',
+                user=user,
+            )
+
+            if success:
+                request.session['password_reset_email'] = (
+                    user.email
+                )
+
+                messages.success(
+                    request,
+                    'A password reset OTP has been sent to your email.'
+                )
+
+                return redirect(
+                    'verify_password_reset_otp'
+                )
+
+            messages.error(
+                request,
+                message
+            )
+
+            return redirect('forgot_password')
+
+        # Do not reveal whether an email address is registered.
+        messages.success(
+            request,
+            'If an account exists for that email address, '
+            'a password reset OTP has been sent.'
+        )
+
+        return redirect('forgot_password')
+
+    return render(
+        request,
+        'tracker/forgot_password.html'
+    )
+
+def verify_password_reset_otp(request):
+    email = request.session.get(
+        'password_reset_email'
+    )
+
+    if not email:
+        messages.error(
+            request,
+            'Your password reset session has expired. '
+            'Please start again.'
+        )
+
+        return redirect('forgot_password')
+
+    user = User.objects.filter(
+        email__iexact=email,
+        is_active=True,
+    ).first()
+
+    if user is None:
+        messages.error(
+            request,
+            'Your password reset session is no longer valid.'
+        )
+
+        request.session.pop(
+            'password_reset_email',
+            None
+        )
+
+        return redirect('forgot_password')
+
+    if request.method == 'POST':
+        otp = request.POST.get(
+            'otp',
+            ''
+        ).strip()
+
+        if not otp.isdigit() or len(otp) != 6:
+            messages.error(
+                request,
+                'Please enter a valid 6-digit OTP.'
+            )
+
+            return render(
+                request,
+                'tracker/verify_otp.html',
+                {
+                    'purpose': 'password_reset',
+                    'email': user.email,
+                }
+            )
+
+        success, message, otp_record = verify_otp(
+            email=user.email,
+            purpose='password_reset',
+            otp=otp,
+        )
+
+        if success:
+            request.session[
+                'password_reset_verified_user_id'
+            ] = user.id
+
+            request.session.pop(
+                'password_reset_email',
+                None
+            )
+
+            messages.success(
+                request,
+                'Email verified. You can now set a new password.'
+            )
+
+            return redirect(
+                'reset_password'
+            )
+
+        messages.error(
+            request,
+            message
+        )
+
+    return render(
+        request,
+        'tracker/verify_otp.html',
+        {
+            'purpose': 'password_reset',
+            'email': user.email,
+        }
+    )
+
+def reset_password(request):
+    user_id = request.session.get(
+        'password_reset_verified_user_id'
+    )
+
+    if not user_id:
+        messages.error(
+            request,
+            'Your password reset session has expired. '
+            'Please start again.'
+        )
+
+        return redirect('forgot_password')
+
+    user = get_object_or_404(
+        User,
+        pk=user_id,
+        is_active=True,
+    )
+
+    if request.method == 'POST':
+        form = SetPasswordForm(
+            user=user,
+            data=request.POST
+        )
+
+        if form.is_valid():
+            form.save()
+
+            request.session.pop(
+                'password_reset_verified_user_id',
+                None
+            )
+
+            messages.success(
+                request,
+                'Your password has been reset successfully. '
+                'You can now log in.'
+            )
+
+            return redirect('login')
+
+    else:
+        form = SetPasswordForm(
+            user=user
+        )
+
+    return render(
+        request,
+        'tracker/reset_password.html',
+        {
+            'form': form,
+        }
+    )
 
 @login_required
 def profile(request):
@@ -297,10 +660,165 @@ def change_password(request):
         )
 
         if form.is_valid():
-            user = form.save()
+            new_password = form.cleaned_data['new_password1']
 
-            # Keep the user logged in after changing the password.
-            update_session_auth_hash(request, user)
+            pending_password_hash = make_password(
+                new_password
+            )
+
+            success, message = send_otp(
+                email=request.user.email,
+                purpose='password_change',
+                user=request.user,
+            )
+
+            if not success:
+                messages.error(
+                    request,
+                    message
+                )
+
+                return render(
+                    request,
+                    'tracker/change_password.html',
+                    {'form': form}
+                )
+
+            otp_record = (
+                EmailOTP.objects
+                .filter(
+                    email=request.user.email,
+                    purpose='password_change',
+                    is_used=False,
+                )
+                .order_by('-created_at')
+                .first()
+            )
+
+            if otp_record is None:
+                messages.error(
+                    request,
+                    'We could not prepare the password change verification. '
+                    'Please try again.'
+                )
+
+                return render(
+                    request,
+                    'tracker/change_password.html',
+                    {'form': form}
+                )
+
+            otp_record.pending_password_hash = (
+                pending_password_hash
+            )
+
+            otp_record.save(
+                update_fields=['pending_password_hash']
+            )
+
+            request.session['password_change_user_id'] = (
+                request.user.id
+            )
+
+            messages.success(
+                request,
+                'A verification OTP has been sent to your email.'
+            )
+
+            return redirect(
+                'verify_password_change_otp'
+            )
+
+    else:
+        form = CustomPasswordChangeForm(
+            user=request.user
+        )
+
+    return render(
+        request,
+        'tracker/change_password.html',
+        {'form': form}
+    )
+
+@login_required
+def verify_password_change_otp(request):
+    user_id = request.session.get(
+        'password_change_user_id'
+    )
+
+    if not user_id or user_id != request.user.id:
+        messages.error(
+            request,
+            'Your password change verification session has expired.'
+        )
+
+        return redirect('change_password')
+
+    user = get_object_or_404(
+        User,
+        pk=user_id,
+        is_active=True,
+    )
+
+    if request.method == 'POST':
+        otp = request.POST.get(
+            'otp',
+            ''
+        ).strip()
+
+        if not otp.isdigit() or len(otp) != 6:
+            messages.error(
+                request,
+                'Please enter a valid 6-digit OTP.'
+            )
+
+            return render(
+                request,
+                'tracker/verify_otp.html',
+                {
+                    'purpose': 'password_change',
+                    'email': user.email,
+                }
+            )
+
+        success, message, otp_record = verify_otp(
+            email=user.email,
+            purpose='password_change',
+            otp=otp,
+        )
+
+        if success:
+            if not otp_record.pending_password_hash:
+                messages.error(
+                    request,
+                    'The password change verification data is missing. '
+                    'Please start again.'
+                )
+
+                return redirect('change_password')
+
+            user.password = (
+                otp_record.pending_password_hash
+            )
+
+            user.save(
+                update_fields=['password']
+            )
+
+            update_session_auth_hash(
+                request,
+                user
+            )
+
+            otp_record.pending_password_hash = None
+            otp_record.save(
+                update_fields=['pending_password_hash']
+            )
+
+            request.session.pop(
+                'password_change_user_id',
+                None
+            )
 
             messages.success(
                 request,
@@ -308,14 +826,71 @@ def change_password(request):
             )
 
             return redirect('profile')
-    else:
-        form = CustomPasswordChangeForm(user=request.user)
+
+        messages.error(
+            request,
+            message
+        )
 
     return render(
         request,
-        'tracker/change_password.html',
-        {'form': form}
+        'tracker/verify_otp.html',
+        {
+            'purpose': 'password_change',
+            'email': user.email,
+        }
     )
+
+@login_required
+def delete_account(request):
+    if request.user.is_staff:
+        messages.error(
+            request,
+            'Administrator accounts cannot be deleted from this page.'
+        )
+        return redirect('profile')
+
+    if request.method == 'POST':
+        password = request.POST.get(
+            'password',
+            ''
+        )
+
+        if not request.user.check_password(password):
+            messages.error(
+                request,
+                'Incorrect password. Account deletion was not started.'
+            )
+
+            return redirect('profile')
+
+        success, message = send_otp(
+            email=request.user.email,
+            purpose='account_delete',
+            user=request.user,
+        )
+
+        if not success:
+            messages.error(
+                request,
+                message
+            )
+
+            return redirect('profile')
+
+        request.session['delete_account_user_id'] = request.user.id
+
+        messages.success(
+            request,
+            'A verification OTP has been sent to your email.'
+        )
+
+        return redirect(
+            'verify_delete_account_otp'
+        )
+
+    return redirect('profile')
+
 @login_required
 def dashboard(request):
     # ---------------------------------------------------------
@@ -3832,3 +4407,81 @@ def export_report_excel(request):
 
 
     return response
+
+@login_required
+def verify_delete_account_otp(request):
+    user_id = request.session.get(
+        'delete_account_user_id'
+    )
+
+    if not user_id or user_id != request.user.id:
+        messages.error(
+            request,
+            'Your account deletion verification session has expired.'
+        )
+        return redirect('profile')
+
+    user = get_object_or_404(
+        User,
+        pk=user_id,
+        is_active=True,
+    )
+
+    if request.method == 'POST':
+        otp = request.POST.get(
+            'otp',
+            ''
+        ).strip()
+
+        if not otp.isdigit() or len(otp) != 6:
+            messages.error(
+                request,
+                'Please enter a valid 6-digit OTP.'
+            )
+
+            return render(
+                request,
+                'tracker/verify_otp.html',
+                {
+                    'purpose': 'account_delete',
+                    'email': user.email,
+                }
+            )
+
+        success, message, otp_record = verify_otp(
+            email=user.email,
+            purpose='account_delete',
+            otp=otp,
+        )
+
+        if success:
+            with db_transaction.atomic():
+                user.delete()
+
+            request.session.pop(
+                'delete_account_user_id',
+                None
+            )
+
+            logout(request)
+
+            messages.success(
+                request,
+                'Your account and associated data have been permanently deleted.'
+            )
+
+            return redirect('login')
+
+        messages.error(
+            request,
+            message
+        )
+
+    return render(
+        request,
+        'tracker/verify_otp.html',
+        {
+            'purpose': 'account_delete',
+            'email': user.email,
+        }
+    )

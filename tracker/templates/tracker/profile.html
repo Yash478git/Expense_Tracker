@@ -132,6 +132,10 @@
             grid-template-columns:
                 280px minmax(0, 1fr);
 
+            grid-template-areas:
+                "profile form"
+                "danger form";
+
             gap: 20px;
 
             align-items: start;
@@ -143,6 +147,8 @@
            ===================================================== */
 
         .profile-card {
+            grid-area: profile;
+
             background: white;
 
             border: 1px solid #e5e7eb;
@@ -261,6 +267,8 @@
            ===================================================== */
 
         .form-card {
+            grid-area: form;
+
             background: white;
 
             border: 1px solid #e5e7eb;
@@ -547,6 +555,118 @@
 
 
         /* =====================================================
+           DELETE ACCOUNT
+           ===================================================== */
+
+        .danger-card {
+            grid-area: danger;
+
+            margin-top: 0;
+            background: #fff;
+            border: 1px solid #fecaca;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .danger-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .danger-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #dc2626;
+            font-size: 19px;
+        }
+
+        .danger-header h2 {
+            font-size: 17px;
+            margin-bottom: 4px;
+            color: #991b1b;
+        }
+
+        .danger-header p {
+            color: #6b7280;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .danger-warning {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .delete-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .delete-form label {
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .delete-form input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 9px;
+            background: #fff;
+            color: #374151;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .delete-form input:focus {
+            border-color: #f87171;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.10);
+        }
+
+        .delete-btn {
+            align-self: flex-end;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 165px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 9px;
+            background: #dc2626;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(220, 38, 38, 0.18);
+        }
+
+
+        /* =====================================================
            RESPONSIVE
            ===================================================== */
 
@@ -746,6 +866,52 @@
             border-color: #818cf8;
         }
 
+        html[data-theme="dark"] .danger-card {
+            background: linear-gradient(180deg, #151b2d 0%, #121827 100%);
+            border-color: rgba(248, 113, 113, 0.28);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.22);
+        }
+
+        html[data-theme="dark"] .danger-icon {
+            background: rgba(220, 38, 38, 0.14);
+            color: #fca5a5;
+        }
+
+        html[data-theme="dark"] .danger-header h2 {
+            color: #fca5a5;
+        }
+
+        html[data-theme="dark"] .danger-header p {
+            color: #9da7ba;
+        }
+
+        html[data-theme="dark"] .danger-warning {
+            background: rgba(194, 65, 12, 0.12);
+            border-color: rgba(251, 146, 60, 0.22);
+            color: #fdba74;
+        }
+
+        html[data-theme="dark"] .delete-form label {
+            color: #cbd5e1;
+        }
+
+        html[data-theme="dark"] .delete-form input {
+            background: #0f1728;
+            border-color: #34405a;
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .delete-form input::placeholder {
+            color: #778198;
+        }
+
+        html[data-theme="dark"] .delete-form input:focus {
+            background: #121a2d;
+            border-color: #f87171;
+            box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.13);
+        }
+
+
         @media (max-width: 800px) {
 
             .page {
@@ -770,6 +936,11 @@
 
             .profile-grid {
                 grid-template-columns: 1fr;
+
+                grid-template-areas:
+                    "profile"
+                    "form"
+                    "danger";
             }
 
 
@@ -794,7 +965,8 @@
 
             .cancel-btn,
             .save-btn,
-            .password-btn {
+            .password-btn,
+            .delete-btn {
                 width: 100%;
             }
 
@@ -1061,6 +1233,68 @@
 
                 </form>
 
+
+            </div>
+
+
+            <!-- =================================================
+                 DELETE ACCOUNT
+                 ================================================= -->
+
+            <div class="danger-card">
+
+                <div class="danger-header">
+
+                    <div class="danger-icon">
+                        ⚠
+                    </div>
+
+                    <div>
+                        <h2>Delete Account</h2>
+                        <p>
+                            Permanently delete your account and all of your
+                            personal Expense Tracker data.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="danger-warning">
+                    This action cannot be undone. Your current password is
+                    required first, and a verification OTP will be sent to
+                    your registered email before deletion is completed.
+                </div>
+
+                <form
+                    method="POST"
+                    action="{% url 'delete_account' %}"
+                    class="delete-form"
+                    onsubmit="return confirm('Are you sure you want to start the account deletion process?');"
+                >
+
+                    {% csrf_token %}
+
+                    <label for="delete-password">
+                        Enter your current password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="delete-password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                        placeholder="Enter your current password"
+                    >
+
+                    <button
+                        type="submit"
+                        class="delete-btn"
+                    >
+                        🗑 Delete Account
+                    </button>
+
+                </form>
 
             </div>
 

@@ -359,6 +359,31 @@
 
 
         /* =====================================================
+           FORGOT PASSWORD LINK
+           ===================================================== */
+
+        .forgot-password-link {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .forgot-password-link a {
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition:
+                color 0.2s ease,
+                opacity 0.2s ease;
+        }
+
+        .forgot-password-link a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
            REGISTER LINK
            ===================================================== */
 
@@ -462,6 +487,15 @@
 
         html[data-theme="dark"] .register-text a {
             color: #8ea8ff !important;
+        }
+
+
+        html[data-theme="dark"] .forgot-password-link a {
+            color: #a5b4fc;
+        }
+
+        html[data-theme="dark"] .forgot-password-link a:hover {
+            color: #c7d2fe;
         }
 
 
@@ -637,6 +671,15 @@
                     autocomplete="current-password"
                     required
                 >
+
+            </div>
+
+
+            <div class="forgot-password-link">
+
+                <a href="{% url 'forgot_password' %}">
+                    Forgot Password?
+                </a>
 
             </div>
 

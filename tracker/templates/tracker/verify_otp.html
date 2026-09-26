@@ -1,0 +1,462 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% if purpose == 'registration' %}
+            Verify Email - Expense Tracker
+        {% elif purpose == 'password_change' %}
+            Verify Password Change - Expense Tracker
+        {% elif purpose == 'account_delete' %}
+            Verify Account Deletion - Expense Tracker
+        {% else %}
+            Verify OTP - Expense Tracker
+        {% endif %}
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/css/style.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tracker/theme.css' %}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <link
+        rel="shortcut icon"
+        href="{% static 'tracker/favicon.png' %}?v=3"
+    >
+
+    <style>
+        :root {
+            --otp-primary: #6366f1;
+            --otp-primary-dark: #4f46e5;
+            --otp-border: #e5e7eb;
+            --otp-muted: #6b7280;
+            --otp-danger: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: #f5f7fb;
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        .otp-page {
+            width: min(460px, 100%);
+        }
+
+        .otp-card {
+            background: #ffffff;
+            border: 1px solid var(--otp-border);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.10);
+        }
+
+        .otp-header {
+            padding: 28px 28px 24px;
+            background:
+                linear-gradient(
+                    135deg,
+                    #6366f1,
+                    #7c3aed
+                );
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .otp-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.16);
+            font-size: 26px;
+        }
+
+        .otp-header h1 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .otp-header p {
+            margin: 8px 0 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .otp-body {
+            padding: 28px;
+        }
+
+        .message {
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--otp-danger);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .email-box {
+            margin-bottom: 22px;
+            padding: 13px 14px;
+            border-radius: 11px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .email-box strong {
+            display: block;
+            margin-top: 4px;
+            color: #111827;
+            font-size: 13px;
+            word-break: break-word;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #374151;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            text-align: center;
+        }
+
+        .otp-input {
+            width: 100%;
+            height: 58px;
+            padding: 0 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #111827;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: 10px;
+            text-align: center;
+            outline: none;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+        }
+
+        .otp-input:focus {
+            border-color: var(--otp-primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.10);
+        }
+
+        .otp-input::placeholder {
+            color: #cbd5e1;
+            letter-spacing: 8px;
+        }
+
+        .help-text {
+            margin-top: 9px;
+            color: var(--otp-muted);
+            font-size: 11px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .verify-btn {
+            width: 100%;
+            min-height: 46px;
+            margin-top: 20px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--otp-primary);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .verify-btn:hover {
+            background: var(--otp-primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 17px;
+            color: var(--otp-muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--otp-primary);
+        }
+
+        html[data-theme="dark"] body {
+            background: var(--background);
+            color: var(--text);
+        }
+
+        html[data-theme="dark"] .otp-card {
+            background: #151b2d;
+            border-color: #2b354d;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+        }
+
+        html[data-theme="dark"] .email-box {
+            background: #0f1728;
+            border-color: #293349;
+            color: #aeb8ca;
+        }
+
+        html[data-theme="dark"] .email-box strong {
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .field-label {
+            color: #dbe3ef;
+        }
+
+        html[data-theme="dark"] .otp-input {
+            background: #0f1728;
+            border-color: #34405a;
+            color: #f8fafc;
+        }
+
+        html[data-theme="dark"] .otp-input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+        }
+
+        html[data-theme="dark"] .help-text,
+        html[data-theme="dark"] .back-link {
+            color: #8f9ab0;
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 14px;
+            }
+
+            .otp-header,
+            .otp-body {
+                padding: 22px;
+            }
+
+            .otp-header h1 {
+                font-size: 22px;
+            }
+
+            .otp-input {
+                font-size: 24px;
+                letter-spacing: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="otp-page">
+
+    <div class="otp-card">
+
+        <div class="otp-header">
+
+            <div class="otp-icon">
+                {% if purpose == 'registration' %}
+                    ✉️
+                {% elif purpose == 'password_change' %}
+                    🔐
+                {% elif purpose == 'account_delete' %}
+                    ⚠️
+                {% else %}
+                    🔑
+                {% endif %}
+            </div>
+
+            <h1>
+                {% if purpose == 'registration' %}
+                    Verify Your Email
+                {% elif purpose == 'password_change' %}
+                    Verify Password Change
+                {% elif purpose == 'account_delete' %}
+                    Verify Account Deletion
+                {% else %}
+                    Verify OTP
+                {% endif %}
+            </h1>
+
+            <p>
+                {% if purpose == 'registration' %}
+                    Enter the 6-digit OTP sent to your email address
+                    to complete your registration.
+                {% elif purpose == 'password_change' %}
+                    Enter the 6-digit OTP sent to your email address
+                    to confirm your password change.
+                {% elif purpose == 'account_delete' %}
+                    Enter the 6-digit OTP sent to your email address
+                    to confirm permanent account deletion.
+                {% else %}
+                    Enter the 6-digit OTP sent to your email address
+                    to continue.
+                {% endif %}
+            </p>
+
+        </div>
+
+        <div class="otp-body">
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="email-box">
+                OTP sent to
+                <strong>{{ email }}</strong>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <label
+                    for="otp"
+                    class="field-label"
+                >
+                    Verification Code
+                </label>
+
+                <input
+                    type="text"
+                    id="otp"
+                    name="otp"
+                    class="otp-input"
+                    inputmode="numeric"
+                    autocomplete="one-time-code"
+                    pattern="[0-9]{6}"
+                    maxlength="6"
+                    minlength="6"
+                    placeholder="••••••"
+                    required
+                    autofocus
+                >
+
+                <div class="help-text">
+                    The OTP expires after 10 minutes and allows
+                    a maximum of 5 incorrect attempts.
+                </div>
+
+                <button
+                    type="submit"
+                    class="verify-btn"
+                >
+                    {% if purpose == 'registration' %}
+                        Verify Email
+                    {% elif purpose == 'password_change' %}
+                        Verify & Change Password
+                    {% elif purpose == 'account_delete' %}
+                        Verify & Delete Account
+                    {% else %}
+                        Verify OTP
+                    {% endif %}
+                </button>
+
+            </form>
+
+            {% if purpose == 'registration' %}
+
+                <a
+                    href="{% url 'register' %}"
+                    class="back-link"
+                >
+                    ← Back to Registration
+                </a>
+
+            {% elif purpose == 'password_change' %}
+
+                <a
+                    href="{% url 'change_password' %}"
+                    class="back-link"
+                >
+                    ← Back to Change Password
+                </a>
+
+            {% elif purpose == 'account_delete' %}
+
+                <a
+                    href="{% url 'profile' %}"
+                    class="back-link"
+                >
+                    ← Back to Profile
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{% url 'login' %}"
+                    class="back-link"
+                >
+                    ← Back to Login
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{% static 'tracker/theme.js' %}"></script>
+
+</body>
+</html>

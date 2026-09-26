@@ -5,12 +5,47 @@ from . import views
 
 urlpatterns = [
     path('register/', views.register, name='register'),
+    path(
+        'register/verify-otp/',
+        views.verify_registration_otp,
+        name='verify_registration_otp'
+    ),
     path('login/', views.user_login, name='login'),
+    path(
+    'forgot-password/',
+    views.forgot_password,
+    name='forgot_password'
+),
+    path(
+    'forgot-password/verify-otp/',
+    views.verify_password_reset_otp,
+    name='verify_password_reset_otp'
+),
+    path(
+    'forgot-password/reset/',
+    views.reset_password,
+    name='reset_password'
+),
     path('profile/', views.profile, name='profile'),
+    path(
+        'profile/delete-account/',
+        views.delete_account,
+        name='delete_account'
+    ),
+    path(
+        'profile/delete-account/verify-otp/',
+        views.verify_delete_account_otp,
+        name='verify_delete_account_otp'
+    ),
     path(
     'profile/change-password/',
     views.change_password,
     name='change_password'
+),
+    path(
+    'profile/change-password/verify-otp/',
+    views.verify_password_change_otp,
+    name='verify_password_change_otp'
 ),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('logout/', views.user_logout, name='logout'),

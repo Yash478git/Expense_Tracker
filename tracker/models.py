@@ -205,3 +205,68 @@ class RecurringTransaction(models.Model):
             f'{self.description or self.category.name} '
             f'- ₹{self.amount}'
         )
+
+class EmailOTP(models.Model):
+    PURPOSE_CHOICES = [
+        ('registration', 'Registration'),
+        ('password_change', 'Password Change'),
+        ('password_reset', 'Password Reset'),
+        ('account_delete', 'Account Deletion'),
+    ]
+
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        related_name='email_otps',
+        null=True,
+        blank=True,
+    )
+
+    email = models.EmailField(
+        max_length=254
+    )
+
+    otp_hash = models.CharField(
+        max_length=128
+    )
+
+    pending_password_hash = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+    )
+
+    purpose = models.CharField(
+        max_length=20,
+        choices=PURPOSE_CHOICES
+    )
+
+    expires_at = models.DateTimeField()
+
+    attempts = models.PositiveSmallIntegerField(
+        default=0
+    )
+
+    is_used = models.BooleanField(
+        default=False
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=['email', 'purpose', 'is_used']
+            ),
+            models.Index(
+                fields=['expires_at']
+            ),
+        ]
+
+    def __str__(self):
+        return (
+            f'{self.email} - '
+            f'{self.get_purpose_display()}'
+        )
